@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/white"
+    android:id="@+id/random_list_container"
+    app:cardElevation="8dp"
+    app:cardCornerRadius="16dp"
+    android:layout_margin="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <!--            android:text="Dish Name"   -->
+
+        <!--            android:ellipsize="marquee"-->
+        <!--            android:marqueeRepeatLimit="marquee_forever"-->
+        <!--            android:scrollHorizontally="true"-->
+        <!--            android:singleLine="true"-->
+        <!--            android:textStyle="bold"-->
+        <!--            android:textColor="@color/black"-->
+        <!--            android:textSize="22dp"-->
+        <!--            android:padding="8dp"-->
+
+<!--        <TextView-->
+
+<!--            android:id="@+id/textView_title"-->
+
+
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            />-->
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            android:layout_margin="8dp">
+
+            <ImageView
+                android:id="@+id/imageView_food"
+                android:scaleType="centerCrop"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"/>
+        </androidx.cardview.widget.CardView>
+<!--        <ImageView-->
+<!--            android:id="@+id/imageView_food"-->
+<!--            android:scaleType="centerCrop"-->
+<!--            android:layout_margin = "8dp"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="180dp"/>-->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+<!--            <LinearLayout-->
+<!--                android:orientation="vertical"-->
+<!--                android:gravity="center"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1">-->
+<!--                <ImageView-->
+<!--                    android:src="@drawable/ic_servings"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"/>-->
+<!--                <TextView-->
+<!--                    android:id="@+id/textView_servings"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:padding="8dp"-->
+<!--                    android:text="2 people"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textAlignment="center"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"/>-->
+
+<!--            </LinearLayout>-->
+<!--            <LinearLayout-->
+<!--                android:orientation="vertical"-->
+<!--                android:gravity="center"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1">-->
+<!--                <ImageView-->
+<!--                    android:src="@drawable/ic_like"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"/>-->
+<!--                <TextView-->
+<!--                    android:id="@+id/textView_like"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:padding="8dp"-->
+<!--                    android:text="likes"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textAlignment="center"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"/>-->
+
+<!--            </LinearLayout>-->
+<!--            <LinearLayout-->
+<!--                android:orientation="vertical"-->
+<!--                android:gravity="center"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1">-->
+<!--                <ImageView-->
+<!--                    android:src="@drawable/ic_time"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"/>-->
+<!--                <TextView-->
+<!--                    android:id="@+id/textView_time"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:padding="8dp"-->
+<!--                    android:text="time"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textAlignment="center"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"/>-->
+
+<!--            </LinearLayout>-->
+<!--        </LinearLayout>-->
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
