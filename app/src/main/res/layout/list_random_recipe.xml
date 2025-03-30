@@ -15,26 +15,6 @@
         android:orientation="vertical"
         >
 
-        <!--            android:text="Dish Name"   -->
-
-        <!--            android:ellipsize="marquee"-->
-        <!--            android:marqueeRepeatLimit="marquee_forever"-->
-        <!--            android:scrollHorizontally="true"-->
-        <!--            android:singleLine="true"-->
-        <!--            android:textStyle="bold"-->
-        <!--            android:textColor="@color/black"-->
-        <!--            android:textSize="22dp"-->
-        <!--            android:padding="8dp"-->
-
-<!--        <TextView-->
-
-<!--            android:id="@+id/textView_title"-->
-
-
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            />-->
-
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
