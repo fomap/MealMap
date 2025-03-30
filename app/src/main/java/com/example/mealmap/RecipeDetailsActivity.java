@@ -15,9 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mealmap.Adapters.IngredientsAdapter;
+import com.example.mealmap.Adapters.InstructionsAdapter;
+import com.example.mealmap.Listeners.InstructionsListener;
 import com.example.mealmap.Listeners.RecipeDetailsListener;
+import com.example.mealmap.Models.InstructionsResponse;
 import com.example.mealmap.Models.RecipeDetailsResponse;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
 
@@ -25,10 +30,12 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     TextView textView_meal_name;
     TextView textView_recipe_type_ready_time;
     ImageView imageView_mealImage;
-    RecyclerView recycler_meal_ingredients;
+    RecyclerView recycler_meal_ingredients, recycler_meal_instructions;
     RequestManager manager;
     ProgressDialog dialog;
     IngredientsAdapter ingredientsAdapter;
+
+    InstructionsAdapter instructionsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +47,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         id = Integer.parseInt(getIntent().getStringExtra("id"));
 
         manager = new RequestManager(this);
+        manager.getInstructions(instructionsListener, id);
         manager.getRecipeDetails(recipeDetailsListener, id);
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading details...");
@@ -66,6 +74,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
             recycler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this));
             ingredientsAdapter = new IngredientsAdapter(RecipeDetailsActivity.this, response.extendedIngredients);
             recycler_meal_ingredients.setAdapter(ingredientsAdapter);
+
         }
 
 
@@ -78,7 +87,24 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     textView_meal_name = findViewById(R.id.textView_meal_name);
     imageView_mealImage = findViewById(R.id.imageView_mealImage);
     recycler_meal_ingredients = findViewById(R.id.recycler_meal_ingredients);
-    recycler_meal_ingredients = findViewById(R.id.recycler_meal_ingredients);
     textView_recipe_type_ready_time = findViewById(R.id.textView_recipe_type_ready_time);
+    recycler_meal_instructions = findViewById(R.id.recycler_meal_instructions);
     }
+
+    private final InstructionsListener instructionsListener = new InstructionsListener() {
+        @Override
+        public void didFetch(List<InstructionsResponse> response, String message) {
+
+            recycler_meal_instructions.setHasFixedSize(true);
+            recycler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.VERTICAL, false));
+            instructionsAdapter = new InstructionsAdapter(RecipeDetailsActivity.this, response);
+            recycler_meal_instructions.setAdapter(instructionsAdapter);
+
+        }
+
+        @Override
+        public void didError(String message) {
+
+        }
+    };
 }

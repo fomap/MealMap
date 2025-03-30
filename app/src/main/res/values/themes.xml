@@ -16,6 +16,7 @@
         <item name="editTextColor">@android:color/black</item>
         <item name="android:textColorHint">#8C8C8C</item>
 
+        <item name="android:fontFamily">@font/sfprodisplayregular</item>
 
     </style>
 </resources>
