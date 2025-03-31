@@ -11,15 +11,16 @@
         android:icon="@drawable/mealplan"
         android:title="Meal Plan" />
 
+
+
+    <item
+        android:id="@+id/bottomNav_chat"
+        android:icon="@drawable/ic_playlist"
+        android:title="Playlist" />
+
     <item
         android:id="@+id/bottomNav_groceryList"
         android:icon="@drawable/grocerylist"
         android:title="Grocery List" />
-
-    <item
-        android:id="@+id/bottomNav_chat"
-        android:icon="@drawable/chat"
-        android:title="Chat" />
-
 </menu>
 

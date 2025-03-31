@@ -80,6 +80,43 @@
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
+
+
+            <LinearLayout
+                android:id="@+id/btnLL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:id="@+id/btn_add_to_playlist"
+                    android:text="Add to playlist"
+                    android:textColor="@color/white"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/rounded_effect_btn"
+                    android:backgroundTint="#A3B18A"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp">
+                </Button>
+
+                <Button
+                    android:id="@+id/btn_add_to_meal_plan"
+                    android:text="Add to meal plan"
+                    android:textColor="@color/white"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/rounded_effect_btn"
+                    android:backgroundTint="#A3B18A"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp">
+                </Button>
+            </LinearLayout>
+
+
+
         </LinearLayout>
+
+
     </ScrollView>
 </LinearLayout>
