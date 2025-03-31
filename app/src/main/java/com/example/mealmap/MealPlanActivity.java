@@ -26,8 +26,7 @@ public class MealPlanActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMealPlanBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_meal_plan);
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = binding.viewPager;
@@ -36,35 +35,35 @@ public class MealPlanActivity extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
         FloatingActionButton fab = binding.fab;
 
-//        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-//
-//        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-//
-//            int itemId = item.getItemId();
-//
-//            if (itemId == R.id.bottomNav_today) {
-//                startActivity(new Intent(MealPlanActivity.this, MainActivity.class));
+        BottomNavigationView bottomNavigationView = findViewById(R.id.meal_plan_bottomNavigationView);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.bottomNav_today) {
+                startActivity(new Intent(MealPlanActivity.this, MainActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+//            else if (itemId == R.id.bottomNav_mealPlan) {
+//                startActivity(new Intent(MainActivity.this, MealPlanActivity.class));
 //                overridePendingTransition(0, 0);
 //                return true;
 //            }
-////            else if (itemId == R.id.bottomNav_mealPlan) {
-////                startActivity(new Intent(MainActivity.this, MealPlanActivity.class));
-////                overridePendingTransition(0, 0);
-////                return true;
-////            }
-//            else if (itemId == R.id.bottomNav_playlist) {
-//                startActivity(new Intent(MealPlanActivity.this, PlaylistActivity.class));
+            else if (itemId == R.id.bottomNav_playlist) {
+                startActivity(new Intent(MealPlanActivity.this, PlaylistActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+//            else if (itemId == R.id.bottomNav_groceryList) {
+//                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
 //                overridePendingTransition(0, 0);
 //                return true;
 //            }
-////            else if (itemId == R.id.bottomNav_groceryList) {
-////                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
-////                overridePendingTransition(0, 0);
-////                return true;
-////            }
-//
-//            return true;
-//        });
+
+            return true;
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -15,11 +15,14 @@
         android:theme="@style/Theme.MealMap"
         tools:targetApi="31">
         <activity
+            android:name=".SignUpActivity"
+            android:exported="false"
+            android:label="@string/title_activity_sign_up" />
+        <activity
             android:name=".MealPlanActivity"
             android:exported="false"
             android:label="@string/title_activity_meal_plan"
-            android:parentActivityName=".MainActivity"
-            />
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PlaylistActivity"
             android:exported="false"
@@ -31,8 +34,11 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name">
+            android:exported="false"
+            android:label="@string/app_name"></activity>
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
