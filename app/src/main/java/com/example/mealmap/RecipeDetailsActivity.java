@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -34,14 +35,13 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     RequestManager manager;
     ProgressDialog dialog;
     IngredientsAdapter ingredientsAdapter;
-
     InstructionsAdapter instructionsAdapter;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_details);
-
         findViews();
 
         id = Integer.parseInt(getIntent().getStringExtra("id"));
@@ -52,6 +52,10 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading details...");
         dialog.show();
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
@@ -89,6 +93,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     recycler_meal_ingredients = findViewById(R.id.recycler_meal_ingredients);
     textView_recipe_type_ready_time = findViewById(R.id.textView_recipe_type_ready_time);
     recycler_meal_instructions = findViewById(R.id.recycler_meal_instructions);
+
     }
 
     private final InstructionsListener instructionsListener = new InstructionsListener() {

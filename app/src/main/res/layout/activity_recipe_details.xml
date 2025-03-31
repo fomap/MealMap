@@ -8,10 +8,13 @@
     android:orientation="vertical"
     tools:context=".RecipeDetailsActivity">
 
-    <Toolbar
-        android:title="Recipe details"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+
         android:layout_width="match_parent"
-        android:layout_height="45dp"/>
+        android:layout_height="45dp">
+
+    </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
         android:layout_width="match_parent"
