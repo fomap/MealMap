@@ -19,4 +19,18 @@
         <item name="android:fontFamily">@font/sfprodisplayregular</item>
 
     </style>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MealMap" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.MealMap.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.MealMap.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.MealMap.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

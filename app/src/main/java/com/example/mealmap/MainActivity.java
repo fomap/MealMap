@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     List<String> tags = new ArrayList<>();
     SearchView searchView;
 
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,34 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(spinnerSelectedListener);
 
         manager = new RequestManager(this);
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.bottomNav_today) {
+                startActivity(new Intent(MainActivity.this, MainActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (itemId == R.id.bottomNav_mealPlan) {
+                startActivity(new Intent(MainActivity.this, MealPlanActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (itemId == R.id.bottomNav_playlist) {
+                startActivity(new Intent(MainActivity.this, PlaylistActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+//            else if (itemId == R.id.bottomNav_groceryList) {
+//                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            }
+
+            return true;
+        });
 
     }
 

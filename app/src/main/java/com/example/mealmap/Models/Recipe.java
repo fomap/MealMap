@@ -1,8 +1,14 @@
 package com.example.mealmap.Models;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.ArrayList;
 
+@Entity
 public class Recipe {
+    
+    @PrimaryKey
     public int id;
     public String image;
     public String imageType;
@@ -40,4 +46,7 @@ public class Recipe {
     public Object originalId;
     public double spoonacularScore;
     public String spoonacularSourceUrl;
+
+
+
 }

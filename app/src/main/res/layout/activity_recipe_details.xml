@@ -34,6 +34,7 @@
                 android:scaleType="centerCrop"/>
 
             <TextView
+
                 android:id="@+id/textView_meal_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,6 +49,7 @@
                 android:ellipsize="end"
                 android:singleLine="false"/>
             <TextView
+                android:background="@color/white"
                 android:id="@+id/textView_recipe_type_ready_time"
                 android:text="Lunch • 15 minutes"
                 android:textColor="@color/black"
