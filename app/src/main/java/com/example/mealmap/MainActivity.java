@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_mealPlan) {
-                startActivity(new Intent(MainActivity.this, MealPlanActivity.class));
+                startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_playlist) {
@@ -104,12 +104,6 @@ public class MainActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             }
-//            else if (itemId == R.id.bottomNav_groceryList) {
-//                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            }
-
             return true;
         });
 

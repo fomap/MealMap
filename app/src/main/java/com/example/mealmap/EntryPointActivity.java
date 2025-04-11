@@ -13,6 +13,8 @@ import androidx.core.view.WindowInsetsCompat;
 public class EntryPointActivity extends AppCompatActivity {
 
 
+    // this activity is the first screen user sees when opening the app, from here, users will be redirected to sign up / logic activities
+
     Button emailSignInBtn;
 
     @Override

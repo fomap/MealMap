@@ -65,7 +65,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
 
         btn_add_to_meal_plan.setOnClickListener(v -> {
 
-            startActivity(new Intent(this, MealPlanActivity.class));
+            startActivity(new Intent(this, MealPlanningActivity.class));
             finish();
 
         });

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MealPlanActivity">
+    tools:context=".MealPlanningActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -39,20 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="16dp"
         app:srcCompat="@android:drawable/ic_dialog_email" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/meal_plan_bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:itemIconTint="@color/black"
-        app:itemTextAppearanceActiveBoldEnabled="false"
-        app:itemTextColor="@color/black"
-        app:labelVisibilityMode="labeled"
-        app:layout_anchor="@+id/view_pager"
-        app:layout_anchorGravity="bottom|center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -23,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class SignUpActivity extends AppCompatActivity {
 
+    //this activity is responsible for signing up using email
+
     private FirebaseAuth auth;
     private EditText signupEmail, signupPassword;
     private Button btnSignUp;
