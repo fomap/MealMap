@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_mealPlan) {
+//                startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
                 startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
                 overridePendingTransition(0, 0);
                 return true;
