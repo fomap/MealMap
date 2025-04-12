@@ -1,7 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recycler_meal_plan"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"/>
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear Entire Meal Plan"
+        android:backgroundTint="#FF0000"
+        android:textColor="#FFFFFF"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_meal_plan"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>
