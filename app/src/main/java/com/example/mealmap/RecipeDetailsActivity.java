@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -75,10 +76,8 @@ public class RecipeDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "UID: " + UID, Toast.LENGTH_SHORT).show();
         }
 
-        String recipeId = String.valueOf(id);
-
         btn_add_to_meal_plan.setOnClickListener(v -> {
-            showDayOfWeekPopup(recipeId, UID, textView_meal_name.getText().toString());
+            showDayOfWeekPopup();
         });
 
         btn_add_to_playlist.setOnClickListener( view -> {
@@ -90,23 +89,34 @@ public class RecipeDetailsActivity extends AppCompatActivity {
 
     }
 
-    private void showDayOfWeekPopup(final String recipeId, final String userId, final String recipeName) {
-
-
-        final Dialog dialog = new Dialog(this);
+    private void showDayOfWeekPopup() {
+        Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
         dialog.setContentView(R.layout.day_of_week_popup);
 
-        final CheckBox chkMonday = dialog.findViewById(R.id.chk_monday);
-        final CheckBox chkTuesday = dialog.findViewById(R.id.chk_tuesday);
-        final CheckBox chkWednesday = dialog.findViewById(R.id.chk_wednesday);
-        final CheckBox chkThursday = dialog.findViewById(R.id.chk_thursday);
-        final CheckBox chkFriday = dialog.findViewById(R.id.chk_friday);
-        final CheckBox chkSaturday = dialog.findViewById(R.id.chk_saturday);
-        final CheckBox chkSunday = dialog.findViewById(R.id.chk_sunday);
+        Window window = dialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+            layoutParams.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.8);
+            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            window.setAttributes(layoutParams);
+        }
 
+
+
+
+        CheckBox chkMonday = dialog.findViewById(R.id.chk_monday);
+        CheckBox chkTuesday = dialog.findViewById(R.id.chk_tuesday);
+        CheckBox chkWednesday = dialog.findViewById(R.id.chk_wednesday);
+        CheckBox chkThursday = dialog.findViewById(R.id.chk_thursday);
+        CheckBox chkFriday = dialog.findViewById(R.id.chk_friday);
+        CheckBox chkSaturday = dialog.findViewById(R.id.chk_saturday);
+        CheckBox chkSunday = dialog.findViewById(R.id.chk_sunday);
         Button btnSaveToDB = dialog.findViewById(R.id.btn_saveToDB);
+
+
         btnSaveToDB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,15 +156,14 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         public void didFetch(RecipeDetailsResponse response, String message) {
             dialog.dismiss();
             textView_meal_name.setText(response.title);
-
             Picasso.get().load(response.image).into(imageView_mealImage);
-
             String mealType;
             if (response.dishTypes != null && !response.dishTypes.isEmpty()) {
                 mealType = response.dishTypes.get(0);
             } else {
                 mealType = "Meal";
             }
+
             String readyTime = response.readyInMinutes + " minutes";
             textView_recipe_type_ready_time.setText(mealType + " • " + readyTime);
             recycler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this));

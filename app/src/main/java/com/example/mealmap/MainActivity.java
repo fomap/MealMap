@@ -13,22 +13,14 @@ import android.widget.Toast;
 import com.example.mealmap.Adapters.RandomRecipeAdapter;
 import com.example.mealmap.Listeners.RandomRecipeResponseListener;
 import com.example.mealmap.Listeners.RecipeClickListener;
+import com.example.mealmap.MealPlanning.MealPlanningActivity;
 import com.example.mealmap.Models.RandomRecipeApiResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.mealmap.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
 import java.util.List;

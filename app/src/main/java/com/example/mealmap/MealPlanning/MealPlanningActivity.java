@@ -1,7 +1,11 @@
-package com.example.mealmap;
+package com.example.mealmap.MealPlanning;
 import android.content.Intent;
 import android.os.Bundle;
 import com.example.mealmap.Adapters.ViewPagerAdapter;
+import com.example.mealmap.GroceryListActivity;
+import com.example.mealmap.MainActivity;
+import com.example.mealmap.PlaylistActivity;
+import com.example.mealmap.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,9 +44,9 @@ public class MealPlanningActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_groceryList) {
-//                startActivity(new Intent(MealPlanningActivity.this, MealPlanningActivity.class));
-////                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
-//                overridePendingTransition(0, 0);
+                startActivity(new Intent(MealPlanningActivity.this, GroceryListActivity.class));
+//                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
+                overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_playlist) {
                 startActivity(new Intent(MealPlanningActivity.this, PlaylistActivity.class));

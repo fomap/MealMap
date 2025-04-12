@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.mealmap.MealPlanFragment;
+import com.example.mealmap.MealPlanning.MealPlanFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
     private final String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};

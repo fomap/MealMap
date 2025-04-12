@@ -114,11 +114,6 @@
                     android:textSize="15sp">
                 </Button>
             </LinearLayout>
-
-
-
         </LinearLayout>
-
-
     </ScrollView>
 </LinearLayout>
