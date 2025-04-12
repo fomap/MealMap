@@ -55,6 +55,10 @@ dependencies {
     implementation(libs.activity)
 
 
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.auth.ktx)
+
+
     implementation(libs.room.runtime)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
@@ -64,6 +68,10 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
     annotationProcessor(libs.room.compiler)
@@ -71,6 +79,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+
 
     implementation(libs.androidx.appcompat.v140)
     debugImplementation(libs.ui.tooling)

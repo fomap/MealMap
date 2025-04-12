@@ -14,6 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MealMap"
         tools:targetApi="31">
+
         <activity
             android:name=".MealPlanningActivity"
             android:exported="false"
@@ -34,12 +35,12 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            android:exported="false">
+<!--        <intent-filter>-->
+<!--            <action android:name="android.intent.action.MAIN" />-->
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+<!--            <category android:name="android.intent.category.LAUNCHER" />-->
+<!--        </intent-filter>-->
 
         </activity>
 
@@ -49,15 +50,15 @@
 
 
         </activity>
-<!--        <activity-->
-<!--            android:name=".EntryPointActivity"-->
-<!--            android:exported="true">-->
-<!--         <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
+        <activity
+            android:name=".EntryPointActivity"
+            android:exported="true">
+         <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter> -->
-<!--        </activity>-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -20,6 +21,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -30,48 +33,43 @@ public class SignUpActivity extends AppCompatActivity {
     private Button btnSignUp;
     private TextView loginRedirect;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
 
+        setContentView(R.layout.activity_sign_up);
         auth = FirebaseAuth.getInstance();
         signupEmail = findViewById(R.id.sighup_email);
         signupPassword = findViewById(R.id.sighup_password);
         btnSignUp = findViewById(R.id.btn_sign_up);
         loginRedirect = findViewById(R.id.textView_loginRedirect);
 
-
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String user = signupEmail.getText().toString().trim();
                 String pass = signupPassword.getText().toString().trim();
-
-                if(user.isEmpty())
-                {
-                    signupEmail.setError("Email is required");
+                if (user.isEmpty()){
+                    signupEmail.setError("Email cannot be empty");
                 }
-                else if(pass.isEmpty())
-                {
+                if (pass.isEmpty()){
                     signupPassword.setError("Password cannot be empty");
-                }else {
+                } else{
                     auth.createUserWithEmailAndPassword(user, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isComplete()){
-                                Toast.makeText(SignUpActivity.this, "Sign up successful", Toast.LENGTH_SHORT).show();
+                            if (task.isSuccessful()) {
+                                Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
-                            }else{
-                                Toast.makeText(SignUpActivity.this, "Sign up failed" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(SignUpActivity.this, "SignUp Failed" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 }
-
             }
         });
-
         loginRedirect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

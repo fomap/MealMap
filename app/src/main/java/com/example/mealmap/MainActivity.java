@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         manager = new RequestManager(this);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
 
             int itemId = item.getItemId();
@@ -96,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_mealPlan) {
-//                startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
                 startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
+//                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_playlist) {
@@ -112,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private final RandomRecipeResponseListener randomRecipeResponseListener = new RandomRecipeResponseListener() {
+
+
         @Override
         public void didFetch(RandomRecipeApiResponse response, String message) {
 
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     private final RecipeClickListener recipeClickListener = new RecipeClickListener() {
         @Override
         public void onRecipeClicked(String id) {
-           // Toast.makeText(MainActivity.this, id, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, id, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, RecipeDetailsActivity.class)
                     .putExtra("id", id));
         }

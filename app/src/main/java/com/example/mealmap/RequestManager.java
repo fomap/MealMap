@@ -55,14 +55,6 @@ public class RequestManager {
         });
     }
 
-    private interface CaLLRandomRecipes{
-        @GET("recipes/random")
-        Call<RandomRecipeApiResponse> callRandomRecipe(
-                @Query("apiKey") String apiKey,
-                @Query("number") String number,
-                @Query("tags") List<String> tags
-        );
-    }
 
     public void getRecipeDetails(RecipeDetailsListener listener, int id)
     {
@@ -106,6 +98,16 @@ public class RequestManager {
             }
         });
     }
+
+    private interface CaLLRandomRecipes{
+        @GET("recipes/random")
+        Call<RandomRecipeApiResponse> callRandomRecipe(
+                @Query("apiKey") String apiKey,
+                @Query("number") String number,
+                @Query("tags") List<String> tags
+        );
+    }
+
     private interface CallRecipeDetails{
         @GET("recipes/{id}/information")
         Call<RecipeDetailsResponse> callRecipeDerails(
@@ -121,6 +123,8 @@ public class RequestManager {
                 @Query("apiKey") String apiKey
         );
     }
+
+
 
 
 }

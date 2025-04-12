@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Days"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <CheckBox
+        android:id="@+id/chk_monday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Monday" />
+
+    <CheckBox
+        android:id="@+id/chk_tuesday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tuesday" />
+
+    <CheckBox
+        android:id="@+id/chk_wednesday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wednesday" />
+
+    <CheckBox
+        android:id="@+id/chk_thursday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thursday" />
+
+    <CheckBox
+        android:id="@+id/chk_friday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Friday" />
+
+    <CheckBox
+        android:id="@+id/chk_saturday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Saturday" />
+
+    <CheckBox
+        android:id="@+id/chk_sunday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sunday" />
+
+    <Button
+        android:id="@+id/btn_saveToDB"
+        android:backgroundTint="#A3B18A"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_gravity="end"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>

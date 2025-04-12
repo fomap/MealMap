@@ -1,6 +1,8 @@
 [versions]
 agp = "8.9.0"
 appcompatVersion = "1.4.0"
+firebaseAuthKtx = "23.2.0"
+firebaseDatabaseKtx = "21.0.0"
 gbutton = "v1.0.19"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -28,11 +30,17 @@ roomCompiler = "2.6.1"
 roomRuntime = "2.6.1"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.2.0"
+firebaseDatabase = "21.0.0"
+credentials = "1.5.0"
+credentialsPlayServicesAuth = "1.5.0"
+googleid = "1.1.1"
 
 [libraries]
 
 androidx-appcompat-v140 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "lifecycleLivedataVersion" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 gbutton = { module = "com.github.TutorialsAndroid:GButton", version.ref = "gbutton" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -66,6 +74,10 @@ ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 
 #com.squareup.retrofit2:retrofit:2.11.0
 

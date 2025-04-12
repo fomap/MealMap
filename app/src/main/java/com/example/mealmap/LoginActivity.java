@@ -1,9 +1,12 @@
 package com.example.mealmap;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,11 +20,22 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
-    private EditText loginEmail, loginPassword;
+    private EditText  loginPassword, loginEmail;
     private Button btnLogin;
     private TextView signupRedirect;
 
@@ -31,10 +45,18 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         auth = FirebaseAuth.getInstance();
-        loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
+        loginEmail = findViewById(R.id.login_email);
         btnLogin = findViewById(R.id.btn_login);
         signupRedirect = findViewById(R.id.textView_signUpRedirect);
+
+
+        signupRedirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            }
+        });
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,18 +67,22 @@ public class LoginActivity extends AppCompatActivity {
                 if(!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if(!pass.isEmpty())
                     {
+//
                         auth.signInWithEmailAndPassword(email, pass)
-                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                                    @Override
-                                    public void onSuccess(AuthResult authResult) {
-                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                .addOnSuccessListener(authResult -> {
+                                    FirebaseUser user = authResult.getUser();
+                                    if (user != null) {
+                                        String uid = user.getUid();
+
+
+                                        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                                                .getReference("users")
+                                                .child(uid);
+
+                                        DatabaseReference mealPlanRef = userRef.child("mealPlan");
+                                        DatabaseReference playlistsRef = userRef.child("playlists");
                                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                         finish();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -71,14 +97,6 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-                signupRedirect.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-                    }
-                });
-
-
 
     }
 }
