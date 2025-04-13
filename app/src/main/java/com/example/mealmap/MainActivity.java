@@ -81,32 +81,65 @@ public class MainActivity extends AppCompatActivity {
         manager = new RequestManager(this);
 
         bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setOnNavigationItemSelectedListener(item -> {
 
+        bottomNav.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
+            Class<?> targetActivity = null;
 
             if (itemId == R.id.bottomNav_today) {
-                startActivity(new Intent(MainActivity.this, MainActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.bottomNav_mealPlan) {
-                startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
-//                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
-                overridePendingTransition(0, 0);
-                return true;
+                targetActivity = MainActivity.class;
+            } else if (itemId == R.id.bottomNav_groceryList) {
+                targetActivity = GroceryListActivity.class;
             } else if (itemId == R.id.bottomNav_playlist) {
-                startActivity(new Intent(MainActivity.this, PlaylistActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
+                targetActivity = PlaylistActivity.class;
+            } else if (itemId == R.id.bottomNav_mealPlan) {
+                targetActivity = MealPlanningActivity.class;
             }
-            else {
-                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
+
+            if (targetActivity != null) {
+                Intent intent = new Intent(getApplicationContext(), targetActivity);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 overridePendingTransition(0, 0);
-                return true;
             }
-//            return true;
+            return true;
         });
 
+//        bottomNav.setOnNavigationItemSelectedListener(item -> {
+//
+//            int itemId = item.getItemId();
+//
+//            if (itemId == R.id.bottomNav_today) {
+//                startActivity(new Intent(MainActivity.this, MainActivity.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            } else if (itemId == R.id.bottomNav_mealPlan) {
+//                startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
+////                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            } else if (itemId == R.id.bottomNav_playlist) {
+//                startActivity(new Intent(MainActivity.this, PlaylistActivity.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            }
+//            else {
+//                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            }
+////            return true;
+//        });
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
     }
 
 

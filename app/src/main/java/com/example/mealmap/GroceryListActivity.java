@@ -66,142 +66,150 @@ public class GroceryListActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) UID = user.getUid();
 
-//        fetchMealPlanRecipes();
+
 
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-
             int itemId = item.getItemId();
+            Class<?> targetActivity = null;
 
             if (itemId == R.id.bottomNav_today) {
-                startActivity(new Intent(GroceryListActivity.this, MainActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.bottomNav_mealPlan) {
-                startActivity(new Intent(GroceryListActivity.this, MealPlanningActivity.class));
-//                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
-                overridePendingTransition(0, 0);
-                return true;
+                targetActivity = MainActivity.class;
+            } else if (itemId == R.id.bottomNav_groceryList) {
+                targetActivity = GroceryListActivity.class;
             } else if (itemId == R.id.bottomNav_playlist) {
-                startActivity(new Intent(GroceryListActivity.this, PlaylistActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
+                targetActivity = PlaylistActivity.class;
+            } else if (itemId == R.id.bottomNav_mealPlan) {
+                targetActivity = MealPlanningActivity.class;
             }
-            else {
-                startActivity(new Intent(GroceryListActivity.this, GroceryListActivity.class));
+
+            if (targetActivity != null) {
+                Intent intent = new Intent(getApplicationContext(), targetActivity);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 overridePendingTransition(0, 0);
-                return true;
             }
-//            return true;
+            return true;
         });
+
+        fetchMealPlanRecipes();
 
     }
 
-//    private void fetchMealPlanRecipes() {
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-//                .child("users").child(UID).child("MealPlan");
-//
-//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//
-//                Map<Integer, Integer> recipeCounts = new HashMap<>();
-//
-//                for (DataSnapshot daySnapshot : snapshot.getChildren()) {
-//                    for (DataSnapshot recipeSnapshot : daySnapshot.getChildren()) {
-//
-//                        Integer id = recipeSnapshot.child("id").getValue(Integer.class);
-//                        if (id != null) {
-//
-//                            int currentCount = recipeCounts.containsKey(id) ? recipeCounts.get(id) : 0;
-//                            recipeCounts.put(id, currentCount + 1);
-//                        }
-//                    }
-//                }
-//
-//                fetchRecipeDetails(recipeCounts);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                progressDialog.dismiss();
-//                Toast.makeText(GroceryListActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 
-//    private void fetchRecipeDetails(Map<Integer, Integer> recipeCounts) {
-//        RequestManager manager = new RequestManager(GroceryListActivity.this);
-//        AtomicInteger counter = new AtomicInteger(0);
-//        int totalRecipes = recipeCounts.size();
-//
-//        if (totalRecipes == 0) {
-//            progressDialog.dismiss();
-//            updateUI();
-//            return;
-//        }
-//
-//        for (Map.Entry<Integer, Integer> entry : recipeCounts.entrySet()) {
-//            Integer id = entry.getKey();
-//            Integer count = entry.getValue();
-//
-//            manager.getRecipeDetails(new RecipeDetailsListener() {
-//                @Override
-//                public void didFetch(RecipeDetailsResponse response, String message) {
-//                    // Pass the count to combineIngredients
-//                    combineIngredients(response.extendedIngredients, count);
-//                    if (counter.incrementAndGet() == totalRecipes) {
-//                        progressDialog.dismiss();
-//                        updateUI();
-//                    }
-//                }
-//
-//                @Override
-//                public void didError(String message) {
-//                    Toast.makeText(GroceryListActivity.this, "Failed to fetch recipe: " + message, Toast.LENGTH_SHORT).show();
-//                    if (counter.incrementAndGet() == totalRecipes) {
-//                        progressDialog.dismiss();
-//                        updateUI();
-//                    }
-//                }
-//            }, id);
-//        }
-//    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+    }
 
-//    private void combineIngredients(List<ExtendedIngredient> ingredients, int recipeCount) {
-//        for (ExtendedIngredient ingredient : ingredients) {
-//            String key = ingredient.name.toLowerCase() + "|" + ingredient.unit.toLowerCase();
-//
-//            if (combinedIngredients.containsKey(key)) {
-//                ExtendedIngredient existing = combinedIngredients.get(key);
-//                // Multiply the ingredient amount by the recipe count before adding
-//                existing.amount += (ingredient.amount * recipeCount);
-//            } else {
-//                // Create a copy of the ingredient to avoid modifying the original
-//                ExtendedIngredient newIngredient = new ExtendedIngredient();
-//                newIngredient.id = ingredient.id;
-//                newIngredient.aisle = ingredient.aisle;
-//                newIngredient.image = ingredient.image;
-//                newIngredient.consistency = ingredient.consistency;
-//                newIngredient.name = ingredient.name;
-//                newIngredient.nameClean = ingredient.nameClean;
-//                newIngredient.original = ingredient.original;
-//                newIngredient.originalName = ingredient.originalName;
-//                // Multiply the amount by the recipe count
-//                newIngredient.amount = ingredient.amount * recipeCount;
-//                newIngredient.unit = ingredient.unit;
-//                newIngredient.meta = ingredient.meta;
-//                newIngredient.measures = ingredient.measures;
-//
-//                combinedIngredients.put(key, newIngredient);
-//            }
-//        }
-//    }
+    private void fetchMealPlanRecipes() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(UID).child("MealPlan");
 
-//    private void updateUI() {
-//        List<ExtendedIngredient> groceryList = new ArrayList<>(combinedIngredients.values());
-//        adapter = new GroceryAdapter(groceryList);
-//        recyclerView.setAdapter(adapter);
-//    }
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                Map<Integer, Integer> recipeCounts = new HashMap<>();
+
+                for (DataSnapshot daySnapshot : snapshot.getChildren()) {
+                    for (DataSnapshot recipeSnapshot : daySnapshot.getChildren()) {
+
+                        Integer id = recipeSnapshot.child("id").getValue(Integer.class);
+                        if (id != null) {
+
+                            int currentCount = recipeCounts.containsKey(id) ? recipeCounts.get(id) : 0;
+                            recipeCounts.put(id, currentCount + 1);
+                        }
+                    }
+                }
+
+                fetchRecipeDetails(recipeCounts);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressDialog.dismiss();
+                Toast.makeText(GroceryListActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchRecipeDetails(Map<Integer, Integer> recipeCounts) {
+        RequestManager manager = new RequestManager(GroceryListActivity.this);
+        AtomicInteger counter = new AtomicInteger(0);
+        int totalRecipes = recipeCounts.size();
+
+        if (totalRecipes == 0) {
+            progressDialog.dismiss();
+            updateUI();
+            return;
+        }
+
+        for (Map.Entry<Integer, Integer> entry : recipeCounts.entrySet()) {
+            Integer id = entry.getKey();
+            Integer count = entry.getValue();
+
+            manager.getRecipeDetails(new RecipeDetailsListener() {
+                @Override
+                public void didFetch(RecipeDetailsResponse response, String message) {
+                    // Pass the count to combineIngredients
+                    combineIngredients(response.extendedIngredients, count);
+                    if (counter.incrementAndGet() == totalRecipes) {
+                        progressDialog.dismiss();
+                        updateUI();
+                    }
+                }
+
+                @Override
+                public void didError(String message) {
+                    Toast.makeText(GroceryListActivity.this, "Failed to fetch recipe: " + message, Toast.LENGTH_SHORT).show();
+                    if (counter.incrementAndGet() == totalRecipes) {
+                        progressDialog.dismiss();
+                        updateUI();
+                    }
+                }
+            }, id);
+        }
+    }
+
+    private void combineIngredients(List<ExtendedIngredient> ingredients, int recipeCount) {
+        for (ExtendedIngredient ingredient : ingredients) {
+            String key = ingredient.name.toLowerCase() + "|" + ingredient.unit.toLowerCase();
+
+            if (combinedIngredients.containsKey(key)) {
+                ExtendedIngredient existing = combinedIngredients.get(key);
+                // Multiply the ingredient amount by the recipe count before adding
+                existing.amount += (ingredient.amount * recipeCount);
+            } else {
+                // Create a copy of the ingredient to avoid modifying the original
+                ExtendedIngredient newIngredient = new ExtendedIngredient();
+                newIngredient.id = ingredient.id;
+                newIngredient.aisle = ingredient.aisle;
+                newIngredient.image = ingredient.image;
+                newIngredient.consistency = ingredient.consistency;
+                newIngredient.name = ingredient.name;
+                newIngredient.nameClean = ingredient.nameClean;
+                newIngredient.original = ingredient.original;
+                newIngredient.originalName = ingredient.originalName;
+                // Multiply the amount by the recipe count
+                newIngredient.amount = ingredient.amount * recipeCount;
+                newIngredient.unit = ingredient.unit;
+                newIngredient.meta = ingredient.meta;
+                newIngredient.measures = ingredient.measures;
+
+                combinedIngredients.put(key, newIngredient);
+            }
+        }
+    }
+
+    private void updateUI() {
+        List<ExtendedIngredient> groceryList = new ArrayList<>(combinedIngredients.values());
+        adapter = new GroceryAdapter(groceryList);
+        recyclerView.setAdapter(adapter);
+    }
 }

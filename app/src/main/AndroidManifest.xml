@@ -17,29 +17,32 @@
         <activity
             android:name=".GroceryListActivity"
             android:exported="false"
-            android:label="@string/title_activity_grocery_list"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.MealMap" />
 
         <activity
             android:name=".MealPlanning.MealPlanningActivity"
             android:exported="false"
-            android:label="@string/title_activity_meal_planning"
+            android:launchMode="singleTop"
            />
         <activity
             android:name=".Auth.SignUpActivity"
             android:exported="false"
-            android:label="@string/title_activity_sign_up" />
+            android:launchMode="singleTop" />
         <activity
             android:name=".PlaylistActivity"
             android:exported="false"
+            android:launchMode="singleTop"
             />
         <activity
             android:name=".RecipeDetailsActivity"
             android:exported="false"
-            android:theme="@style/Theme.MealMap.NoActionBar"/>
+            android:theme="@style/Theme.MealMap.NoActionBar"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".MainActivity"
-            android:exported="false">
+            android:exported="false"
+            android:launchMode="singleTop">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->

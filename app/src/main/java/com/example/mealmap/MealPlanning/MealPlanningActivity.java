@@ -51,26 +51,61 @@ public class MealPlanningActivity extends AppCompatActivity {
 
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-
-
             int itemId = item.getItemId();
+            Class<?> targetActivity = null;
 
             if (itemId == R.id.bottomNav_today) {
-                startActivity(new Intent(MealPlanningActivity.this, MainActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
+                targetActivity = MainActivity.class;
             } else if (itemId == R.id.bottomNav_groceryList) {
-             //   startActivity(new Intent(MealPlanningActivity.this, GroceryListActivity.class));
-//                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
-              //  overridePendingTransition(0, 0);
-                return true;
+                targetActivity = GroceryListActivity.class;
             } else if (itemId == R.id.bottomNav_playlist) {
-                startActivity(new Intent(MealPlanningActivity.this, PlaylistActivity.class));
+                targetActivity = PlaylistActivity.class;
+            } else if (itemId == R.id.bottomNav_mealPlan) {
+                targetActivity = MealPlanningActivity.class;
+            }
+
+            if (targetActivity != null) {
+                Intent intent = new Intent(getApplicationContext(), targetActivity);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 overridePendingTransition(0, 0);
-                return true;
             }
             return true;
         });
     }
+
+//        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+//
+//
+//            int itemId = item.getItemId();
+//
+//            if (itemId == R.id.bottomNav_today) {
+//                startActivity(new Intent(MealPlanningActivity.this, MainActivity.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            } else if (itemId == R.id.bottomNav_groceryList) {
+//                startActivity(new Intent(MealPlanningActivity.this, GroceryListActivity.class));
+//          //      startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            } else if (itemId == R.id.bottomNav_playlist) {
+//                startActivity(new Intent(MealPlanningActivity.this, PlaylistActivity.class));
+//                overridePendingTransition(0, 0);
+//                return true;
+//            }
+//            return true;
+//        });
+
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+    }
+
 }
