@@ -166,7 +166,7 @@ public class MealPlanFragment extends Fragment {
             Long recipeId = mealSnapshot.child("id").getValue(Long.class);
             if (recipeId != null) {
                 Intent intent = new Intent(requireContext(), RecipeDetailsActivity.class);
-
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 intent.putExtra("id", recipeId.toString());
                 intent.putExtra("source", "mealPlan");
                 intent.putExtra("day", day);

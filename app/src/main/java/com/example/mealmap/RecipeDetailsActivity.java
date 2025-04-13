@@ -79,7 +79,15 @@ public class RecipeDetailsActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Recipe Details");
+        }
+
+        source = getIntent().getStringExtra("source");
+        day = getIntent().getStringExtra("day");
 
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -102,20 +110,27 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        handleBackNavigation();
+        return true;
+    }
+
+
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         handleBackNavigation();
     }
 
     private void handleBackNavigation() {
-        if ("mealPlan".equals(source)) {
-
+        if ("mealPlan".equals(source) && day != null) {
             Intent intent = new Intent(this, MealPlanningActivity.class);
             intent.putExtra("selectedDay", day);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         } else {
-            startActivity(new Intent(this, MainActivity.class));
+            super.onBackPressed();
         }
         finish();
     }
@@ -134,8 +149,6 @@ public class RecipeDetailsActivity extends AppCompatActivity {
             layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(layoutParams);
         }
-
-
 
 
         CheckBox chkMonday = dialog.findViewById(R.id.chk_monday);
@@ -165,46 +178,41 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     }
 
     public void saveToDP(String dayOfWeek) {
-        // 1. Validate recipe data
         if (currentRecipeDetails == null) {
             Toast.makeText(this, "Recipe data not loaded yet.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 2. Validate user authentication
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || user.getUid() == null) {
             Toast.makeText(this, "Not authenticated!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 3. Create reference and get push key FIRST
         DatabaseReference dayRef = FirebaseDatabase.getInstance().getReference()
                 .child("users")
                 .child(user.getUid())
                 .child("MealPlan")
                 .child(dayOfWeek);
 
-        String pushKey = dayRef.push().getKey(); // Generate key before saving
+        String pushKey = dayRef.push().getKey();
 
         if (pushKey == null) {
             Toast.makeText(this, "Failed to generate recipe key", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 4. Prepare data with additional useful fields
         Map<String, Object> recipeData = new HashMap<>();
         recipeData.put("id", currentRecipeDetails.id);
         recipeData.put("title", currentRecipeDetails.title);
         recipeData.put("image", currentRecipeDetails.image);
         recipeData.put("pushKey", pushKey);
-        // 5. Save to specific path with the generated key
+
+
         dayRef.child(pushKey).setValue(recipeData)
                 .addOnSuccessListener(aVoid -> {
-                    // Success - you could return the pushKey here if needed
                     Toast.makeText(this, "Added to " + dayOfWeek, Toast.LENGTH_SHORT).show();
 
-                    // If you need to immediately use this in another activity:
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra("newRecipeKey", pushKey);
                     setResult(RESULT_OK, resultIntent);

@@ -19,16 +19,12 @@
             android:exported="false"
             android:label="@string/title_activity_grocery_list"
             android:theme="@style/Theme.MealMap" />
-        <activity
-            android:name=".GroceryList.GroceryListActivity"
-            android:exported="false"
-            android:label="@string/title_activity_grocery_list"
-            android:theme="@style/Theme.MealMap" />
+
         <activity
             android:name=".MealPlanning.MealPlanningActivity"
             android:exported="false"
             android:label="@string/title_activity_meal_planning"
-            android:parentActivityName=".MainActivity" />
+           />
         <activity
             android:name=".Auth.SignUpActivity"
             android:exported="false"
@@ -36,11 +32,11 @@
         <activity
             android:name=".PlaylistActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            />
         <activity
             android:name=".RecipeDetailsActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:theme="@style/Theme.MealMap.NoActionBar"/>
         <activity
             android:name=".MainActivity"
             android:exported="false">
