@@ -44,9 +44,9 @@ public class MealPlanningActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_groceryList) {
-                startActivity(new Intent(MealPlanningActivity.this, GroceryListActivity.class));
+             //   startActivity(new Intent(MealPlanningActivity.this, GroceryListActivity.class));
 //                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
-                overridePendingTransition(0, 0);
+              //  overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.bottomNav_playlist) {
                 startActivity(new Intent(MealPlanningActivity.this, PlaylistActivity.class));

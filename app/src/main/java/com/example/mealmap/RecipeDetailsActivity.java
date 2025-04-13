@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -30,7 +31,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
 
@@ -45,6 +48,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     InstructionsAdapter instructionsAdapter;
     Toolbar toolbar;
 
+    private RecipeDetailsResponse currentRecipeDetails;
     Button btn_add_to_playlist, btn_add_to_meal_plan;
 
     private String UID;
@@ -120,41 +124,106 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         btnSaveToDB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (chkMonday.isChecked()) {saveToDP(id, "Monday");}
-                if (chkTuesday.isChecked()) {saveToDP(id, "Tuesday");}
-                if (chkWednesday.isChecked()) {saveToDP(id, "Wednesday");}
-                if (chkThursday.isChecked()) {saveToDP(id, "Thursday");}
-                if (chkFriday.isChecked()) {saveToDP(id, "Friday");}
-                if (chkSaturday.isChecked()) {saveToDP(id, "Saturday");}
-                if (chkSunday.isChecked()) {saveToDP(id, "Sunday");}
+                if (chkMonday.isChecked()) {saveToDP("Monday");}
+                if (chkTuesday.isChecked()) {saveToDP("Tuesday");}
+                if (chkWednesday.isChecked()) {saveToDP("Wednesday");}
+                if (chkThursday.isChecked()) {saveToDP("Thursday");}
+                if (chkFriday.isChecked()) {saveToDP("Friday");}
+                if (chkSaturday.isChecked()) {saveToDP("Saturday");}
+                if (chkSunday.isChecked()) {saveToDP("Sunday");}
                 dialog.dismiss();
             }
         });
         dialog.show();
     }
-    public void saveToDP(int id, String dayOfWeek)
-    {
-        DatabaseReference userMealPlanRef = FirebaseDatabase.getInstance().getReference()
+
+    public void saveToDP(String dayOfWeek) {
+        // 1. Validate recipe data
+        if (currentRecipeDetails == null) {
+            Toast.makeText(this, "Recipe data not loaded yet.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 2. Validate user authentication
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || user.getUid() == null) {
+            Toast.makeText(this, "Not authenticated!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 3. Create reference and get push key FIRST
+        DatabaseReference dayRef = FirebaseDatabase.getInstance().getReference()
                 .child("users")
-                .child(UID)
+                .child(user.getUid())
                 .child("MealPlan")
                 .child(dayOfWeek);
 
+        String pushKey = dayRef.push().getKey(); // Generate key before saving
 
-        userMealPlanRef.push().setValue(id)
-                .addOnCompleteListener(task -> {
+        if (pushKey == null) {
+            Toast.makeText(this, "Failed to generate recipe key", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 4. Prepare data with additional useful fields
+        Map<String, Object> recipeData = new HashMap<>();
+        recipeData.put("id", currentRecipeDetails.id);
+        recipeData.put("title", currentRecipeDetails.title);
+        recipeData.put("image", currentRecipeDetails.image);
+        recipeData.put("pushKey", pushKey);
+        // 5. Save to specific path with the generated key
+        dayRef.child(pushKey).setValue(recipeData)
+                .addOnSuccessListener(aVoid -> {
+                    // Success - you could return the pushKey here if needed
                     Toast.makeText(this, "Added to " + dayOfWeek, Toast.LENGTH_SHORT).show();
+
+                    // If you need to immediately use this in another activity:
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("newRecipeKey", pushKey);
+                    setResult(RESULT_OK, resultIntent);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("SAVE_RECIPE", "Error saving recipe", e);
                 });
     }
+//    public void saveToDP(String dayOfWeek)
+//    {
+//        if (currentRecipeDetails == null) {
+//            Toast.makeText(this, "Recipe data not loaded yet.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        DatabaseReference userMealPlanRef = FirebaseDatabase.getInstance().getReference()
+//                .child("users")
+//                .child(UID)
+//                .child("MealPlan")
+//                .child(dayOfWeek);
+//
+//
+//        Map<String, Object> recipeData = new HashMap<>();
+//        recipeData.put("id", currentRecipeDetails.id);
+//        recipeData.put("title", currentRecipeDetails.title);
+//        recipeData.put("image", currentRecipeDetails.image);
+//
+//
+//        userMealPlanRef.push().setValue(recipeData)
+//                .addOnCompleteListener(task -> {
+//                    Toast.makeText(this, "Added to " + dayOfWeek, Toast.LENGTH_SHORT).show();
+//                })
+//                .addOnFailureListener(e -> {
+//                    Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                });
+//    }
 
 
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
         @Override
         public void didFetch(RecipeDetailsResponse response, String message) {
             dialog.dismiss();
+            currentRecipeDetails = response;
+
+
             textView_meal_name.setText(response.title);
             Picasso.get().load(response.image).into(imageView_mealImage);
             String mealType;

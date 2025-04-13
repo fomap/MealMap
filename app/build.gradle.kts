@@ -82,6 +82,8 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
 
+    implementation(libs.androidx.recyclerview)
+
 
     implementation(libs.androidx.appcompat.v140)
     debugImplementation(libs.ui.tooling)

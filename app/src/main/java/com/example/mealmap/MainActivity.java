@@ -96,7 +96,12 @@ public class MainActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             }
-            return true;
+            else {
+                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+//            return true;
         });
 
     }

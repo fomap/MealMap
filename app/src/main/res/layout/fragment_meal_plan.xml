@@ -4,13 +4,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
+
     <Button
         android:id="@+id/btn_clear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Clear Entire Meal Plan"
-        android:backgroundTint="#FF0000"
+        android:text="Clear Meal Plan For day"
+        android:backgroundTint="@color/red"
         android:textColor="#FFFFFF"/>
+
+    <TextView
+        android:id="@+id/textView_empty_meal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Oops! No meal for today?"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:layout_marginTop="50dp"
+        android:visibility="gone"   />
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_meal_plan"
