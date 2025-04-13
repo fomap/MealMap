@@ -20,7 +20,7 @@
         android:id="@+id/textView_meal_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Meal Title"
+        android:text="OLD AND NOT USED"
         android:textSize="17sp"
         android:textStyle="bold"
         android:ellipsize="end"

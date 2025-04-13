@@ -19,6 +19,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     List<String> tags = new ArrayList<>();
     SearchView searchView;
 
-    BottomNavigationView bottomNavigationView;
+    BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
 
         manager = new RequestManager(this);
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        bottomNav.setOnNavigationItemSelectedListener(item -> {
 
             int itemId = item.getItemId();
 
@@ -150,6 +153,13 @@ public class MainActivity extends AppCompatActivity {
                     .putExtra("id", id));
         }
     };
+
+//    private void setupBottomNavigation() {
+//        bottomNav = findViewById(R.id.bottomNavigationView);
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+//
+//        NavigationUI.setupWithNavController(bottomNav, navController);
+//    }
 
 
 }
