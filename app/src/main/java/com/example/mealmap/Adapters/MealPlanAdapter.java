@@ -67,18 +67,45 @@ public class MealPlanAdapter extends RecyclerView.Adapter<MealPlanViewHolder> {
 
 
         holder.btnDelete.setOnClickListener(view -> {
-            Log.d("MealPlanAdapter", "btnDelete clicked");
+           // Log.d("MealPlanAdapter", "btnDelete clicked");
 
             int currentPosition = holder.getAdapterPosition();
-            Log.d("MealPlanAdapter", "Current position: " + currentPosition);
             if(currentPosition != RecyclerView.NO_POSITION) {
-                removeRecipe(currentPosition);
-            } else {
-                Log.w("MealPlanAdapter", "Invalid position: NO_POSITION"); // Log if position is invalid
-            }
 
-            rootDatabaseref = FirebaseDatabase.getInstance().getReference().child("Users");
-            rootDatabaseref.child(UID).child("MealPlan").child(currentDay).child(firebaseKeys.get(position)).setValue(null);
+                removeRecipeNew(position);
+
+//                DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+//                        .child("users")
+//                        .child(UID)
+//                        .child("MealPlan")
+//                        .child(currentDay)
+//                        .child(firebaseKeys.get(position));
+//
+//                Log.d("MealPlanAdapter", "Firebase reference: " + ref.toString());
+//                Toast.makeText(context, ref.toString(), Toast.LENGTH_SHORT).show();
+//
+//                ref.removeValue().addOnCompleteListener(task -> {
+//                    if(task.isSuccessful()) {
+//                        ref.setValue(null);
+////                        int size = list.size();
+////                        list.clear();
+////                        firebaseKeys.clear();
+//                        notifyItemRangeRemoved(0, currentPosition);
+//                        Toast.makeText(context, "Meal plan cleared", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+
+//                rootDatabaseref = FirebaseDatabase.getInstance().getReference().child("Users");
+//                rootDatabaseref.child(UID).child("MealPlan").child(currentDay).child(firebaseKeys.get(position)).setValue(null);
+            //    removeRecipe(currentPosition);
+                //this.notifyDataSetChanged();
+            }
+//            else {
+//                Log.w("MealPlanAdapter", "Invalid position: NO_POSITION"); // Log if position is invalid
+//            }
+
+//            rootDatabaseref = FirebaseDatabase.getInstance().getReference().child("Users");
+//            rootDatabaseref.child(UID).child("MealPlan").child(currentDay).child(firebaseKeys.get(position)).setValue(null);
         });
 
 //        holder.btnDelete.setOnClickListener(v -> {
@@ -100,7 +127,35 @@ public class MealPlanAdapter extends RecyclerView.Adapter<MealPlanViewHolder> {
                 RecipeDetailsResponse selectedRecipe = list.get(currentPosition);
                 Intent intent = new Intent(context, RecipeDetailsActivity.class);
                 intent.putExtra("id", String.valueOf(selectedRecipe.id));
+               // mealplanmadapter.notifyDataSetChanged();
                 context.startActivity(intent);
+
+            }
+        });
+    }
+
+    private void removeRecipeNew(int position) {
+
+        if (position < 0 || position >= firebaseKeys.size()) {
+            return; // Prevent out-of-bounds error
+        }
+
+        // Get the reference to the specific recipe node using the firebase key at the given position
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(UID)
+                .child("MealPlan")
+                .child(currentDay)
+                .child(firebaseKeys.get(position));
+
+        ref.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                list.remove(position);
+                firebaseKeys.remove(position);
+                notifyItemRemoved(position);
+                Toast.makeText(context, "Recipe removed", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Failed to remove recipe", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -132,7 +187,7 @@ public class MealPlanAdapter extends RecyclerView.Adapter<MealPlanViewHolder> {
 
                 Toast.makeText(context, "Recipe removed", Toast.LENGTH_SHORT).show();
 
-        
+
                 ((AppCompatActivity) context).runOnUiThread(() -> {
                     notifyItemRemoved(position);
                     notifyItemRangeChanged(position, getItemCount());
@@ -197,6 +252,8 @@ public class MealPlanAdapter extends RecyclerView.Adapter<MealPlanViewHolder> {
 
 
 }
+
+
 
 class MealPlanViewHolder extends RecyclerView.ViewHolder {
     ImageView mealImage;

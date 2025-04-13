@@ -117,7 +117,7 @@
             android:id="@+id/textView_loginRedirect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Already an user? Login"
+            android:text="Already an user? Log in"
             android:textSize="14sp"
             android:layout_gravity="center"
             android:padding="6dp"
