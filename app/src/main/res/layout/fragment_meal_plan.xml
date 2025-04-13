@@ -1,34 +1,19 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-
+    <LinearLayout
+        android:id="@+id/mealsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
 
     <Button
         android:id="@+id/btn_clear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Clear Meal Plan For day"
-        android:backgroundTint="@color/red"
-        android:textColor="#FFFFFF"/>
-
-    <TextView
-        android:id="@+id/textView_empty_meal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Oops! No meal for today?"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:layout_marginTop="50dp"
-        android:visibility="gone"   />
-
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_meal_plan"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+        android:text="Clear All"
+        android:layout_gravity="end"/>
 </LinearLayout>

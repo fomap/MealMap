@@ -23,6 +23,7 @@ import com.example.mealmap.Adapters.IngredientsAdapter;
 import com.example.mealmap.Adapters.InstructionsAdapter;
 import com.example.mealmap.Listeners.InstructionsListener;
 import com.example.mealmap.Listeners.RecipeDetailsListener;
+import com.example.mealmap.MealPlanning.MealPlanningActivity;
 import com.example.mealmap.Models.InstructionsResponse;
 import com.example.mealmap.Models.RecipeDetailsResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,11 +54,18 @@ public class RecipeDetailsActivity extends AppCompatActivity {
 
     private String UID;
 
+    private String source;
+    private String day;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_details);
+
+        source = getIntent().getStringExtra("source");
+        day = getIntent().getStringExtra("day");
+
         findViews();
 
         id = Integer.parseInt(getIntent().getStringExtra("id"));
@@ -91,6 +99,25 @@ public class RecipeDetailsActivity extends AppCompatActivity {
 
         });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        handleBackNavigation();
+    }
+
+    private void handleBackNavigation() {
+        if ("mealPlan".equals(source)) {
+
+            Intent intent = new Intent(this, MealPlanningActivity.class);
+            intent.putExtra("selectedDay", day);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        } else {
+            startActivity(new Intent(this, MainActivity.class));
+        }
+        finish();
     }
 
     private void showDayOfWeekPopup() {
@@ -187,34 +214,6 @@ public class RecipeDetailsActivity extends AppCompatActivity {
                     Log.e("SAVE_RECIPE", "Error saving recipe", e);
                 });
     }
-//    public void saveToDP(String dayOfWeek)
-//    {
-//        if (currentRecipeDetails == null) {
-//            Toast.makeText(this, "Recipe data not loaded yet.", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        DatabaseReference userMealPlanRef = FirebaseDatabase.getInstance().getReference()
-//                .child("users")
-//                .child(UID)
-//                .child("MealPlan")
-//                .child(dayOfWeek);
-//
-//
-//        Map<String, Object> recipeData = new HashMap<>();
-//        recipeData.put("id", currentRecipeDetails.id);
-//        recipeData.put("title", currentRecipeDetails.title);
-//        recipeData.put("image", currentRecipeDetails.image);
-//
-//
-//        userMealPlanRef.push().setValue(recipeData)
-//                .addOnCompleteListener(task -> {
-//                    Toast.makeText(this, "Added to " + dayOfWeek, Toast.LENGTH_SHORT).show();
-//                })
-//                .addOnFailureListener(e -> {
-//                    Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                });
-//    }
 
 
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {

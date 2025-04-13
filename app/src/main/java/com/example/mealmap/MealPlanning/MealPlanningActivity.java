@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.util.Arrays;
+
 
 public class MealPlanningActivity extends AppCompatActivity {
 
@@ -19,6 +21,9 @@ public class MealPlanningActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager2 viewPager2;
     BottomNavigationView bottomNavigationView;
+
+    private final String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday",
+            "Friday", "Saturday", "Sunday"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +34,25 @@ public class MealPlanningActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tab_layout);
 
         viewPager2.setAdapter(new ViewPagerAdapter(this));
+
+
         new TabLayoutMediator(tabLayout, viewPager2, (tab, position) -> {
-            String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-            tab.setText(days[position]);
+            String[] tabDays = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+            tab.setText(tabDays[position]);
         }).attach();
+
+        if (getIntent() != null && getIntent().hasExtra("selectedDay")) {
+            String selectedDay = getIntent().getStringExtra("selectedDay");
+            int position = Arrays.asList(days).indexOf(selectedDay);
+            if (position >= 0) {
+                viewPager2.setCurrentItem(position, false);
+            }
+        }
+
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+
 
             int itemId = item.getItemId();
 
