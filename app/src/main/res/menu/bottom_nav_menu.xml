@@ -11,8 +11,6 @@
         android:icon="@drawable/mealplan"
         android:title="Meal Plan" />
 
-
-
     <item
         android:id="@+id/bottomNav_playlist"
         android:icon="@drawable/ic_playlist"

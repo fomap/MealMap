@@ -92,4 +92,10 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
+    implementation(libs.github.glide)
+    annotationProcessor(libs.compiler)
+    implementation(libs.androidx.recyclerview.v121)
+
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
 }
