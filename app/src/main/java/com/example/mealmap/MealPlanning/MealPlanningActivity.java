@@ -84,8 +84,8 @@ public class MealPlanningActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
-    private void setupViewPager() {
-        viewPager2.setAdapter(new ViewPagerAdapter(this, days));
-    }
+//    private void setupViewPager() {
+//        viewPager2.setAdapter(new ViewPagerAdapter(this, days));
+//    }
 
 }
