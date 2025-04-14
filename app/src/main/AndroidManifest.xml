@@ -33,6 +33,17 @@
             android:exported="false"
             android:launchMode="singleTop"
             />
+
+        <activity android:name=".Adapters.FragmentHostActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MealMap.NoActionBar"
+            android:parentActivityName=".PlaylistActivity"
+
+            />
+
+<!--        android:theme="@style/AppTheme.NoActionBar"-->
+
+
         <activity
             android:name=".RecipeDetailsActivity"
             android:exported="false"

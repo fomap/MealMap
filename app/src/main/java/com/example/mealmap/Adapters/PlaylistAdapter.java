@@ -1,5 +1,7 @@
 package com.example.mealmap.Adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +44,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         return playlists.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtName;
         private final TextView txtCount;
 
@@ -50,6 +52,19 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             super(itemView);
             txtName = itemView.findViewById(R.id.txt_playlist_name);
             txtCount = itemView.findViewById(R.id.txt_recipe_count);
+
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    Playlist playlist = playlists.get(position);
+                    Context context = itemView.getContext();
+
+                    Intent intent = new Intent(context, FragmentHostActivity.class);
+                    intent.putExtra("collectionType", "playlists");
+                    intent.putExtra("collectionKey", playlist.getKey());
+                    context.startActivity(intent);
+                }
+            });
         }
 
         void bind(Playlist playlist) {

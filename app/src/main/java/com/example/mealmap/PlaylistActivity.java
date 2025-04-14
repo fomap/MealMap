@@ -36,6 +36,7 @@ public class PlaylistActivity extends AppCompatActivity {
     private DatabaseReference playlistsRef;
     private String UID;
 
+    private ValueEventListener playlistsListener;
     BottomNavigationView bottomNavigationView;
 
     @Override
@@ -56,7 +57,7 @@ public class PlaylistActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
+        bottomNavigationView.setSelectedItemId(R.id.bottomNav_playlist);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Class<?> targetActivity = null;
@@ -87,12 +88,7 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     private void loadPlaylists() {
-        DatabaseReference playlistsRef = FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(UID)
-                .child("playlists");
-
-        playlistsRef.addValueEventListener(new ValueEventListener() {
+        playlistsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Playlist> playlists = new ArrayList<>();
@@ -112,7 +108,19 @@ public class PlaylistActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(PlaylistActivity.this, "Error loading playlists", Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+        playlistsRef.addValueEventListener(playlistsListener);
+    }
+
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (playlistsRef != null && playlistsListener != null) {
+            playlistsRef.removeEventListener(playlistsListener);
+        }
     }
 
 
