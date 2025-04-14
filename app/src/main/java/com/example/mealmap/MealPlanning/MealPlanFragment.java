@@ -166,5 +166,18 @@ public class MealPlanFragment extends Fragment {
     }
 
 
+    public void refreshReference(String newCollectionKey) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            mealsRef = FirebaseDatabase.getInstance().getReference()
+                    .child("users")
+                    .child(user.getUid())
+                    .child(collectionType)
+                    .child(newCollectionKey);
+
+            setupMealsListener();
+        }
+    }
+
 }
 
