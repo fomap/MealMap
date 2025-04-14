@@ -6,10 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +14,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
-import com.example.mealmap.Models.RecipeDetailsResponse;
 import com.example.mealmap.R;
 import com.example.mealmap.RecipeDetailsActivity;
-import com.example.mealmap.RequestManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,36 +25,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
 
 public class MealPlanFragment extends Fragment {
-
-
-    private RecyclerView recyclerView;
-  //  private MealPlanAdapter adapter;
-    private List<RecipeDetailsResponse> recipes = new ArrayList<>();
-    private List<String> firebaseKeys = new ArrayList<>();
     Button btnClear;
-
-
-    private String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
     private LinearLayout mealsContainer;
     private String day;
     private DatabaseReference mealsRef;
 
-    private TextView dayHeader;
+    private static final String ARG_COLLECTION_TYPE = "collectionType";
+    private static final String ARG_COLLECTION_KEY = "collectionKey";
+
+    private String collectionType;
+    private String collectionKey;
 
 
-    public static MealPlanFragment newInstance(String day) {
+
+    public static MealPlanFragment newInstance(String collectionType, String collectionKey) {
         MealPlanFragment fragment = new MealPlanFragment();
         Bundle args = new Bundle();
-        args.putString("day", day);
+        args.putString(ARG_COLLECTION_TYPE, collectionType);
+        args.putString(ARG_COLLECTION_KEY, collectionKey);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,13 +53,18 @@ public class MealPlanFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            day = getArguments().getString("day");
+            collectionType = getArguments().getString(ARG_COLLECTION_TYPE);
+            collectionKey = getArguments().getString(ARG_COLLECTION_KEY);
         }
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) UID = user.getUid();
 
-        mealsRef = FirebaseDatabase.getInstance().getReference()
-                .child("users").child(UID).child("MealPlan").child(day);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            mealsRef = FirebaseDatabase.getInstance().getReference()
+                    .child("users")
+                    .child(user.getUid())
+                    .child(collectionType)
+                    .child(collectionKey);
+        }
     }
 
 
@@ -90,16 +77,6 @@ public class MealPlanFragment extends Fragment {
     }
 
 
-
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//        mealsContainer = view.findViewById(R.id.mealsContainer);
-//        Button btnClear = view.findViewById(R.id.btn_clear);
-//
-//        btnClear.setOnClickListener(v -> clearAllRecipes());
-//        setupMealsListener();
-//    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -171,10 +148,8 @@ public class MealPlanFragment extends Fragment {
                     });
         });
 
-
         btnDetails.setOnClickListener(view -> {
             if (!isAdded() || getContext() == null) return;
-
             Long recipeId = mealSnapshot.child("id").getValue(Long.class);
             if (recipeId != null) {
                 Intent intent = new Intent(requireContext(), RecipeDetailsActivity.class);
@@ -182,88 +157,12 @@ public class MealPlanFragment extends Fragment {
                 intent.putExtra("id", recipeId.toString());
                 intent.putExtra("source", "mealPlan");
                 intent.putExtra("day", day);
-
                 startActivity(intent);
             } else {
                 Toast.makeText(getContext(), "Error: Recipe data not available", Toast.LENGTH_SHORT).show();
             }
         });
-
-
         mealsContainer.addView(mealView);
     }
-
-
-
-//    private void clearAllTodayRecipes() {
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-//                .child("users")
-//                .child(UID)
-//                .child("MealPlan")
-//                .child(day);
-//
-//        ref.removeValue().addOnCompleteListener(task -> {
-//            if(task.isSuccessful()) {
-//                recipes.clear();
-//                firebaseKeys.clear();
-//                adapter.notifyDataSetChanged();
-//                Toast.makeText(getContext(), "Meal plan cleared", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 }
-
-//    private void clearAllRecipes() {
-//        mDatabase.child("users").child(UID).child("MealPlan").child(currentDay).removeValue()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        recipes.clear();
-//                        firebaseKeys.clear();
-//                        adapter.notifyDataSetChanged();
-//                        Toast.makeText(getContext(), "All meals removed.", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Toast.makeText(getContext(), "Failed to clear meals.", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
-
-//
-//    private void loadMeals() {
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-//                .child("users").child(UID).child("MealPlan").child(day);
-//
-//        ref.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                recipes.clear();
-//                firebaseKeys.clear();
-//
-//                for (DataSnapshot ds : snapshot.getChildren()) {
-//                    firebaseKeys.add(ds.getKey());
-//
-//                    Long id = ds.child("id").getValue(Long.class);
-//                    String title = ds.child("title").getValue(String.class);
-//                    String image = ds.child("image").getValue(String.class);
-//
-//                    if (id != null && title != null && image != null) {
-//                        RecipeDetailsResponse recipe = new RecipeDetailsResponse();
-//                        recipe.id = id.intValue();
-//                        recipe.title = title;
-//                        recipe.image = image;
-//
-//                        recipes.add(recipe);
-//                    }
-//                }
-//
-//                adapter.notifyDataSetChanged();
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
-
 

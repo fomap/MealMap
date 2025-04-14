@@ -11,12 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mealmap.Models.ExtendedIngredient;
 import com.example.mealmap.R;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
     private List<ExtendedIngredient> groceries;
 
+
+    public GroceryAdapter() {
+        this.groceries = new ArrayList<>();
+    }
     public GroceryAdapter(List<ExtendedIngredient> groceries) {
         this.groceries = groceries;
     }
@@ -36,12 +41,24 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
     }
 
     private String formatQuantity(ExtendedIngredient ingredient) {
-        return String.format(Locale.getDefault(), "%.2f %s", ingredient.amount, ingredient.unit);
+        if (ingredient.amount == (int) ingredient.amount) {
+            return String.format(Locale.getDefault(), "%d %s",
+                    (int) ingredient.amount,
+                    ingredient.unit);
+        }
+        return String.format(Locale.getDefault(), "%.2f %s",
+                ingredient.amount,
+                ingredient.unit);
     }
 
     @Override
     public int getItemCount() {
-        return groceries.size();
+        return groceries != null ? groceries.size() : 0;
+    }
+
+    public void updateList(List<ExtendedIngredient> newGroceries) {
+        this.groceries = new ArrayList<>(newGroceries);
+        notifyDataSetChanged();
     }
 }
 

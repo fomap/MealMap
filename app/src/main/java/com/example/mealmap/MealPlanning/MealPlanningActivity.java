@@ -33,7 +33,7 @@ public class MealPlanningActivity extends AppCompatActivity {
         viewPager2 = findViewById(R.id.viewpager);
         tabLayout = findViewById(R.id.tab_layout);
 
-        viewPager2.setAdapter(new ViewPagerAdapter(this));
+        viewPager2.setAdapter(new ViewPagerAdapter(this, days));
 
 
         new TabLayoutMediator(tabLayout, viewPager2, (tab, position) -> {
@@ -78,34 +78,14 @@ public class MealPlanningActivity extends AppCompatActivity {
         });
     }
 
-//        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-//
-//
-//            int itemId = item.getItemId();
-//
-//            if (itemId == R.id.bottomNav_today) {
-//                startActivity(new Intent(MealPlanningActivity.this, MainActivity.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            } else if (itemId == R.id.bottomNav_groceryList) {
-//                startActivity(new Intent(MealPlanningActivity.this, GroceryListActivity.class));
-//          //      startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            } else if (itemId == R.id.bottomNav_playlist) {
-//                startActivity(new Intent(MealPlanningActivity.this, PlaylistActivity.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            }
-//            return true;
-//        });
-
-
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         moveTaskToBack(true);
+    }
+
+    private void setupViewPager() {
+        viewPager2.setAdapter(new ViewPagerAdapter(this, days));
     }
 
 }

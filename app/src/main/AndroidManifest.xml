@@ -17,8 +17,7 @@
         <activity
             android:name=".GroceryListActivity"
             android:exported="false"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.MealMap" />
+            android:launchMode="singleTop" />
 
         <activity
             android:name=".MealPlanning.MealPlanningActivity"

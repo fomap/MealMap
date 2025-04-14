@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         manager = new RequestManager(this);
 
         bottomNav = findViewById(R.id.bottomNavigationView);
-
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Class<?> targetActivity = null;
@@ -106,33 +105,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-
-//        bottomNav.setOnNavigationItemSelectedListener(item -> {
-//
-//            int itemId = item.getItemId();
-//
-//            if (itemId == R.id.bottomNav_today) {
-//                startActivity(new Intent(MainActivity.this, MainActivity.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            } else if (itemId == R.id.bottomNav_mealPlan) {
-//                startActivity(new Intent(MainActivity.this, MealPlanningActivity.class));
-////                startActivity(new Intent(MainActivity.this, MealPlanningActivityTest.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            } else if (itemId == R.id.bottomNav_playlist) {
-//                startActivity(new Intent(MainActivity.this, PlaylistActivity.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            }
-//            else {
-//                startActivity(new Intent(MainActivity.this, GroceryListActivity.class));
-//                overridePendingTransition(0, 0);
-//                return true;
-//            }
-////            return true;
-//        });
-
     }
 
 
@@ -186,13 +158,5 @@ public class MainActivity extends AppCompatActivity {
                     .putExtra("id", id));
         }
     };
-
-//    private void setupBottomNavigation() {
-//        bottomNav = findViewById(R.id.bottomNavigationView);
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-//
-//        NavigationUI.setupWithNavController(bottomNav, navController);
-//    }
-
 
 }

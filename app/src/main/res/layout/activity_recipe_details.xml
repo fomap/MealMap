@@ -10,6 +10,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/green"
@@ -22,7 +23,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -95,28 +97,22 @@
                 android:layout_alignParentBottom="true">
 
                 <Button
-                    android:id="@+id/btn_add_to_playlist"
-                    android:text="Add to playlist"
+                    android:id="@+id/btn_save_to_collections"
+                    android:onClick="onSaveButtonClick"
+                    android:text="Save recipe"
                     android:textColor="@color/white"
                     android:layout_margin="15dp"
                     android:background="@drawable/rounded_effect_btn"
                     android:backgroundTint="#A3B18A"
-                    android:layout_width="150dp"
+                    android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:textSize="15sp">
                 </Button>
 
-                <Button
-                    android:id="@+id/btn_add_to_meal_plan"
-                    android:text="Add to meal plan"
-                    android:textColor="@color/white"
-                    android:layout_margin="15dp"
-                    android:background="@drawable/rounded_effect_btn"
-                    android:backgroundTint="#A3B18A"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:textSize="15sp">
-                </Button>
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="50dp"-->
+<!--                    android:visibility="invisible"/>-->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -10,10 +10,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,8 +32,11 @@ import com.example.mealmap.Models.InstructionsResponse;
 import com.example.mealmap.Models.RecipeDetailsResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -50,7 +57,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     Toolbar toolbar;
 
     private RecipeDetailsResponse currentRecipeDetails;
-    Button btn_add_to_playlist, btn_add_to_meal_plan;
+    Button btn_save_to_collections;
 
     private String UID;
 
@@ -96,17 +103,10 @@ public class RecipeDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "UID: " + UID, Toast.LENGTH_SHORT).show();
         }
 
-        btn_add_to_meal_plan.setOnClickListener(v -> {
-            showDayOfWeekPopup();
+
+        btn_save_to_collections.setOnClickListener(view -> {
+            showSaveDialog();
         });
-
-        btn_add_to_playlist.setOnClickListener( view -> {
-            startActivity(new Intent(this, PlaylistActivity.class)
-            );
-            finish();
-
-        });
-
     }
 
     @Override
@@ -115,6 +115,9 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         return true;
     }
 
+    public void onSaveButtonClick(View view) {
+        showSaveDialog();
+    }
 
 
     @Override
@@ -184,44 +187,267 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         }
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || user.getUid() == null) {
-            Toast.makeText(this, "Not authenticated!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         DatabaseReference dayRef = FirebaseDatabase.getInstance().getReference()
                 .child("users")
                 .child(user.getUid())
                 .child("MealPlan")
-                .child(dayOfWeek);
+                .child(dayOfWeek)
+                .child(String.valueOf(id));
 
-        String pushKey = dayRef.push().getKey();
 
-        if (pushKey == null) {
-            Toast.makeText(this, "Failed to generate recipe key", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         Map<String, Object> recipeData = new HashMap<>();
         recipeData.put("id", currentRecipeDetails.id);
         recipeData.put("title", currentRecipeDetails.title);
         recipeData.put("image", currentRecipeDetails.image);
-        recipeData.put("pushKey", pushKey);
 
 
-        dayRef.child(pushKey).setValue(recipeData)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Added to " + dayOfWeek, Toast.LENGTH_SHORT).show();
+        dayRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Toast.makeText(RecipeDetailsActivity.this,
+                            "Recipe already exists in " + dayOfWeek,
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("newRecipeKey", pushKey);
-                    setResult(RESULT_OK, resultIntent);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("SAVE_RECIPE", "Error saving recipe", e);
-                });
+                Map<String, Object> recipeData = new HashMap<>();
+                recipeData.put("id", currentRecipeDetails.id);
+                recipeData.put("title", currentRecipeDetails.title);
+                recipeData.put("image", currentRecipeDetails.image);
+
+                dayRef.setValue(recipeData)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(RecipeDetailsActivity.this,
+                                    "Added to " + dayOfWeek,
+                                    Toast.LENGTH_SHORT).show();
+
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("newRecipeKey", id);
+                            setResult(RESULT_OK, resultIntent);
+                        })
+                        .addOnFailureListener(e -> {
+                           Toast.makeText(RecipeDetailsActivity.this,"Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle possible errors
+            }
+        });
+
     }
+
+
+private void showSaveDialog() {
+    Dialog dialog = new Dialog(this);
+    dialog.setContentView(R.layout.collection_selection_popup);
+
+    LinearLayout mealPlanLayout = dialog.findViewById(R.id.mealPlanLayout);
+    LinearLayout playlistLayout = dialog.findViewById(R.id.playlistLayout);
+
+    Button btnCreate = dialog.findViewById(R.id.btn_create_playlist);
+    btnCreate.setOnClickListener(v -> showCreatePlaylistDialog(playlistLayout));
+
+    mealPlanLayout.removeAllViews();
+
+    String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday",
+            "Friday", "Saturday", "Sunday"};
+    for (String day : days) {
+        CheckBox cb = new CheckBox(this);
+        cb.setText(day);
+        cb.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        mealPlanLayout.addView(cb);
+    }
+
+
+    loadPlaylists(playlistLayout);
+
+    dialog.findViewById(R.id.btn_save).setOnClickListener(v -> {
+        saveSelectedCollections(mealPlanLayout, playlistLayout);
+        dialog.dismiss();
+    });
+
+    dialog.show();
+}
+
+    private void saveSelectedCollections(LinearLayout mealPlanLayout, LinearLayout playlistLayout) {
+
+        for (int i = 0; i < mealPlanLayout.getChildCount(); i++) {
+            CheckBox cb = (CheckBox) mealPlanLayout.getChildAt(i);
+            if (cb.isChecked()) {
+                saveToCollection("mealPlan", cb.getText().toString());
+            }
+        }
+
+        for (int i = 0; i < playlistLayout.getChildCount(); i++) {
+            CheckBox cb = (CheckBox) playlistLayout.getChildAt(i);
+            if (cb.isChecked()) {
+                saveToCollection("playlists", cb.getText().toString());
+            }
+        }
+    }
+
+
+    private void loadPlaylists(LinearLayout layout) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        DatabaseReference playlistsRef = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(user.getUid())
+                .child("playlists");
+
+        playlistsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                layout.removeAllViews();
+                for (DataSnapshot playlist : snapshot.getChildren()) {
+                    CheckBox checkBox = new CheckBox(RecipeDetailsActivity.this);
+                    checkBox.setText(playlist.getKey());
+                    layout.addView(checkBox);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                showError(error.toException());
+            }
+        });
+    }
+
+    private void showCreatePlaylistDialog(LinearLayout playlistLayout) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("New Playlist");
+
+        final EditText input = new EditText(this);
+        input.setHint("Enter playlist name");
+        builder.setView(input);
+
+        builder.setPositiveButton("Create", (dialog, which) -> {
+            String playlistName = input.getText().toString().trim();
+            if (!playlistName.isEmpty()) {
+                createPlaylist(playlistName, playlistLayout);
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    private void createPlaylist(String playlistName, LinearLayout playlistLayout) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || playlistName.isEmpty()) return;
+
+        DatabaseReference playlistsRef = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(user.getUid())
+                .child("playlists")
+                .child(playlistName);
+
+
+        playlistsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    playlistsRef.setValue(true).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            CheckBox newPlaylistCheckbox = new CheckBox(RecipeDetailsActivity.this);
+                            newPlaylistCheckbox.setText(playlistName);
+                            playlistLayout.addView(newPlaylistCheckbox);
+                        }
+                    });
+                } else {
+                    Toast.makeText(RecipeDetailsActivity.this,
+                            "Playlist already exists!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(RecipeDetailsActivity.this,
+                        "Error checking playlists: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void saveToCollection(String collectionType, String collectionKey) {
+
+        String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(UID)
+                .child(collectionType)
+                .child(collectionKey)
+                .child(String.valueOf(currentRecipeDetails.id));
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    Map<String, Object> recipeData = new HashMap<>();
+                    recipeData.put("id", currentRecipeDetails.id);
+                    recipeData.put("title", currentRecipeDetails.title);
+                    recipeData.put("image", currentRecipeDetails.image);
+
+                    ref.setValue(recipeData)
+                            .addOnSuccessListener(aVoid -> showSaveSuccess(collectionKey))
+                            .addOnFailureListener(e -> showError(e));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                showError(error.toException());
+            }
+        });
+    }
+
+    private void showSaveSuccess(String collectionName) {
+        String message = "Recipe saved to " + collectionName;
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Helper methods
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setResultWithData(String key) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("newRecipeKey", key);
+        setResult(RESULT_OK, resultIntent);
+    }
+
+    private void showError(Exception e) {
+        Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        Log.e("SAVE_RECIPE", "Error saving recipe", e);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
@@ -258,8 +484,8 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         recycler_meal_ingredients = findViewById(R.id.recycler_meal_ingredients);
         textView_recipe_type_ready_time = findViewById(R.id.textView_recipe_type_ready_time);
         recycler_meal_instructions = findViewById(R.id.recycler_meal_instructions);
-        btn_add_to_playlist = findViewById(R.id.btn_add_to_playlist);
-        btn_add_to_meal_plan = findViewById(R.id.btn_add_to_meal_plan);
+        btn_save_to_collections = findViewById(R.id.btn_save_to_collections);
+       // btn_add_to_meal_plan = findViewById(R.id.btn_add_to_meal_plan);
     }
 
     private final InstructionsListener instructionsListener = new InstructionsListener() {
