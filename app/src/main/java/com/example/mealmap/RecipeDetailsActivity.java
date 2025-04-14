@@ -55,12 +55,9 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     IngredientsAdapter ingredientsAdapter;
     InstructionsAdapter instructionsAdapter;
     Toolbar toolbar;
-
     private RecipeDetailsResponse currentRecipeDetails;
     Button btn_save_to_collections;
-
     private String UID;
-
     private String source;
     private String day;
 
@@ -136,48 +133,6 @@ public class RecipeDetailsActivity extends AppCompatActivity {
             super.onBackPressed();
         }
         finish();
-    }
-
-    private void showDayOfWeekPopup() {
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCancelable(true);
-        dialog.setContentView(R.layout.day_of_week_popup);
-
-        Window window = dialog.getWindow();
-        if (window != null) {
-            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-            layoutParams.copyFrom(window.getAttributes());
-            layoutParams.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.8);
-            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            window.setAttributes(layoutParams);
-        }
-
-
-        CheckBox chkMonday = dialog.findViewById(R.id.chk_monday);
-        CheckBox chkTuesday = dialog.findViewById(R.id.chk_tuesday);
-        CheckBox chkWednesday = dialog.findViewById(R.id.chk_wednesday);
-        CheckBox chkThursday = dialog.findViewById(R.id.chk_thursday);
-        CheckBox chkFriday = dialog.findViewById(R.id.chk_friday);
-        CheckBox chkSaturday = dialog.findViewById(R.id.chk_saturday);
-        CheckBox chkSunday = dialog.findViewById(R.id.chk_sunday);
-        Button btnSaveToDB = dialog.findViewById(R.id.btn_saveToDB);
-
-
-        btnSaveToDB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (chkMonday.isChecked()) {saveToDP("Monday");}
-                if (chkTuesday.isChecked()) {saveToDP("Tuesday");}
-                if (chkWednesday.isChecked()) {saveToDP("Wednesday");}
-                if (chkThursday.isChecked()) {saveToDP("Thursday");}
-                if (chkFriday.isChecked()) {saveToDP("Friday");}
-                if (chkSaturday.isChecked()) {saveToDP("Saturday");}
-                if (chkSunday.isChecked()) {saveToDP("Sunday");}
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
     }
 
     public void saveToDP(String dayOfWeek) {
@@ -415,39 +370,11 @@ private void showSaveDialog() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    // Helper methods
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void setResultWithData(String key) {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("newRecipeKey", key);
-        setResult(RESULT_OK, resultIntent);
-    }
 
     private void showError(Exception e) {
         Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         Log.e("SAVE_RECIPE", "Error saving recipe", e);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
@@ -485,7 +412,6 @@ private void showSaveDialog() {
         textView_recipe_type_ready_time = findViewById(R.id.textView_recipe_type_ready_time);
         recycler_meal_instructions = findViewById(R.id.recycler_meal_instructions);
         btn_save_to_collections = findViewById(R.id.btn_save_to_collections);
-       // btn_add_to_meal_plan = findViewById(R.id.btn_add_to_meal_plan);
     }
 
     private final InstructionsListener instructionsListener = new InstructionsListener() {

@@ -13,7 +13,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Meal Plans:"
+            android:text="SELECT SOURCES FOR GROCERY LIST"
+            android:fontFamily="@font/sfprodisplayregular"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
@@ -69,21 +70,20 @@
 
 
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Select Playlists:"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Select Playlists:"-->
+<!--            android:textSize="18sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:layout_marginBottom="8dp"/>-->
 
         <LinearLayout
             android:id="@+id/linearLayout_playlist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="8dp"/>
+            android:orientation="vertical"         />
 
         <Button
             android:id="@+id/btn_generate"

@@ -28,6 +28,7 @@
 
     <!-- Color resource -->
     <color name="checkbox_color">#2196F3</color>
+    <color name="strikethrough_color">#757575</color>
 
 
     <style name="Theme.MealMap.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

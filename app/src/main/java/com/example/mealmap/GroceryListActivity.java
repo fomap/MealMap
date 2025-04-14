@@ -53,148 +53,95 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class GroceryListActivity extends AppCompatActivity {
+public class GroceryListActivity extends AppCompatActivity implements GrocerySelectorDialog.GrocerySelectionListener {
     private RecyclerView recyclerView;
     private GroceryAdapter adapter;
     private ProgressBar progressBar;
     private TextView txtEmptyState;
-    private Map<String, ExtendedIngredient> combinedIngredients = new HashMap<>();
-    private String UID;
-    private RequestManager requestManager;
-
+    private Button btnReselect;
     BottomNavigationView bottomNavigationView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grocery_list);
 
-        initializeViews();
-        checkUserAuthentication();
-    }
+        btnReselect = findViewById(R.id.btn_reselect);
+        btnReselect.setOnClickListener(v -> showSelectionDialog());
 
-    private void initializeViews() {
         recyclerView = findViewById(R.id.recycler_grocery);
         progressBar = findViewById(R.id.progress_bar);
         txtEmptyState = findViewById(R.id.txt_empty_state);
 
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new GroceryAdapter(new ArrayList<>());
+        adapter = new GroceryAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        setupBottomNavigation();
+
+        showSelectionDialog();
+
     }
 
+    private void setupBottomNavigation() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            Class<?> targetActivity = null;
 
-    private void checkUserAuthentication() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        UID = user.getUid();
-
-        showLoading(true);
-        fetchMealPlanRecipes();
-    }
-
-
-    private void fetchMealPlanRecipes() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                .child("users").child(UID).child("mealPlan");
-
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Set<Integer> uniqueRecipeIds = new HashSet<>();
-                for (DataSnapshot daySnapshot : snapshot.getChildren()) {
-                    for (DataSnapshot recipeSnapshot : daySnapshot.getChildren()) {
-                        Map<String, Object> recipeData = (Map<String, Object>) recipeSnapshot.getValue();
-                        Long idLong = (Long) recipeData.get("id");
-                        if (idLong != null) {
-                            uniqueRecipeIds.add(idLong.intValue());
-                        }
-                    }
-                }
-
-                fetchRecipeDetails(new ArrayList<>(uniqueRecipeIds));
+            if (itemId == R.id.bottomNav_today) {
+                targetActivity = MainActivity.class;
+            } else if (itemId == R.id.bottomNav_groceryList) {
+                targetActivity = GroceryListActivity.class;
+            } else if (itemId == R.id.bottomNav_playlist) {
+                targetActivity = PlaylistActivity.class;
+            } else if (itemId == R.id.bottomNav_mealPlan) {
+                targetActivity = MealPlanningActivity.class;
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                showError("Database error: " + error.getMessage());
+            if (targetActivity != null && !this.getClass().equals(targetActivity)) {
+                navigateToActivity(targetActivity);
             }
+            return true;
         });
+
     }
 
-    private void fetchRecipeDetails(List<Integer> recipeIds) {
-        if (recipeIds.isEmpty()) {
-            updateUI();
-            return;
-        }
-
-        requestManager = new RequestManager(this);
-        AtomicInteger counter = new AtomicInteger(0);
-
-        for (Integer id : recipeIds) {
-            requestManager.getRecipeDetails(new RecipeDetailsListener() {
-                @Override
-                public void didFetch(RecipeDetailsResponse response, String message) {
-                    combineIngredients(response.extendedIngredients);
-                    checkCompletion(counter, recipeIds.size());
-                }
-
-                @Override
-                public void didError(String message) {
-                    Log.e("GroceryList", "Error fetching recipe: " + message);
-                    checkCompletion(counter, recipeIds.size());
-                }
-            }, id);
-        }
+    private void navigateToActivity(Class<?> targetActivity) {
+        Intent intent = new Intent(this, targetActivity);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+                Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
-    private void checkCompletion(AtomicInteger counter, int total) {
-        if (counter.incrementAndGet() == total) {
-            runOnUiThread(this::updateUI);
-        }
+    private void showSelectionDialog() {
+        GrocerySelectorDialog dialog = new GrocerySelectorDialog();
+        dialog.show(getSupportFragmentManager(), "grocery_selector");
     }
 
-    private void combineIngredients(List<ExtendedIngredient> ingredients) {
-        for (ExtendedIngredient ingredient : ingredients) {
-            String key = ingredient.name.toLowerCase().replaceAll("s$", "") + "|" +
-                    ingredient.unit.toLowerCase();
-
-            if (combinedIngredients.containsKey(key)) {
-                ExtendedIngredient existing = combinedIngredients.get(key);
-                existing.amount += ingredient.amount;
-            } else {
-                combinedIngredients.put(key, ingredient);
-            }
-        }
+    @Override
+    public void onGroceryListGenerated(List<ExtendedIngredient> ingredients) {
+        adapter.updateList(new ArrayList<>());
+        updateUI(ingredients);
     }
 
-    private void updateUI() {
-        showLoading(false);
-
-        List<ExtendedIngredient> groceryList = new ArrayList<>(combinedIngredients.values());
-        if (groceryList.isEmpty()) {
+    private void updateUI(List<ExtendedIngredient> ingredients) {
+        if (ingredients.isEmpty()) {
             txtEmptyState.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
             txtEmptyState.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            adapter.updateList(groceryList);
+            adapter.updateList(ingredients);
         }
     }
-
-
     private void showLoading(boolean isLoading) {
         progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-    }
-
-    private void showErrorAndFinish(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        finish();
-    }
-
-    private void showError(String message) {
-        showLoading(false);
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
 }
