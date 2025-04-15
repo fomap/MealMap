@@ -1,19 +1,18 @@
-package com.example.mealmap;
+package com.example.mealmap.Playlist;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.mealmap.Adapters.PlaylistAdapter;
+import com.example.mealmap.GroceryList.GroceryListActivity;
+import com.example.mealmap.MainActivity;
 import com.example.mealmap.MealPlanning.MealPlanningActivity;
-import com.example.mealmap.Playlist.Playlist;
+import com.example.mealmap.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,7 +52,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycler_playlist);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new PlaylistAdapter();
+        adapter = new PlaylistAdapter(this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);

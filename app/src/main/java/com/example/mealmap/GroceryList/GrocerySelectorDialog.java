@@ -1,4 +1,4 @@
-package com.example.mealmap;
+package com.example.mealmap.GroceryList;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.example.mealmap.Listeners.RecipeDetailsListener;
 import com.example.mealmap.Models.RecipeDetailsResponse;
+import com.example.mealmap.R;
+import com.example.mealmap.RequestManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import androidx.annotation.NonNull;

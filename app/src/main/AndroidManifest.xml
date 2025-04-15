@@ -15,7 +15,7 @@
         android:theme="@style/Theme.MealMap"
         tools:targetApi="31">
         <activity
-            android:name=".GroceryListActivity"
+            android:name=".GroceryList.GroceryListActivity"
             android:exported="false"
             android:launchMode="singleTop" />
 
@@ -29,7 +29,7 @@
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
-            android:name=".PlaylistActivity"
+            android:name=".Playlist.PlaylistActivity"
             android:exported="false"
             android:launchMode="singleTop"
             />
@@ -37,7 +37,7 @@
         <activity android:name=".Adapters.FragmentHostActivity"
             android:exported="false"
             android:theme="@style/Theme.MealMap.NoActionBar"
-            android:parentActivityName=".PlaylistActivity"
+            android:parentActivityName=".Playlist.PlaylistActivity"
 
             />
 
