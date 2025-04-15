@@ -9,7 +9,9 @@
 
 <!--    <string name="api_key">eed2d0071424471dae6b5c1c022d0e9d</string>-->
 
-
+    <string name="client_id">756709973136-krj8kunn81s0fn82t9gqta08isrs0ju5.apps.googleusercontent.com</string>
+    
+    
     <string-array name="tags">
         <item>main course</item>
         <item>side dish</item>

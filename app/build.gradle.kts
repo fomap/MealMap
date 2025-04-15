@@ -58,7 +58,6 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.auth.ktx)
 
-
     implementation(libs.room.runtime)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
@@ -96,6 +95,15 @@ dependencies {
     annotationProcessor(libs.compiler)
     implementation(libs.androidx.recyclerview.v121)
 
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    apply(plugin = "com.google.gms.google-services")
+
+
+    implementation("com.google.firebase:firebase-auth:23.2.0")
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.TutorialsAndroid:GButton:v1.0.19")
+    implementation("com.google.android.gms:play-services-auth:20.4.0")
 
 }

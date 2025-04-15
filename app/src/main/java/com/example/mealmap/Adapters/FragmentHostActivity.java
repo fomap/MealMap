@@ -106,10 +106,9 @@ public class FragmentHostActivity extends AppCompatActivity {
     }
 
     private void renamePlaylist(String newName) {
-        // Get reference to current playlist
+
         DatabaseReference oldRef = playlistsRef.child(currentPlaylistKey);
 
-        // Check if new name exists
         playlistsRef.child(newName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
