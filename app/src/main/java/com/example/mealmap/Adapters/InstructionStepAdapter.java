@@ -37,7 +37,7 @@ public class InstructionStepAdapter extends RecyclerView.Adapter<InstructionStep
         holder.textView_instructions_step_number.setText(String.valueOf(list.get(position).number));
         holder.textView_instructions_step_title.setText(list.get(position).step);
 
-        holder.recycler_instructions_ingredients.setHasFixedSize(true);
+      //  holder.recycler_instructions_ingredients.setHasFixedSize(true);
         holder.recycler_instructions_ingredients.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         InstructionsIngredientsAdapter instructionsIngredientsAdapter = new InstructionsIngredientsAdapter(context, list.get(position).ingredients);
         holder.recycler_instructions_ingredients.setAdapter(instructionsIngredientsAdapter);

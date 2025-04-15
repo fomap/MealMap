@@ -418,7 +418,7 @@ private void showSaveDialog() {
         @Override
         public void didFetch(List<InstructionsResponse> response, String message) {
 
-            recycler_meal_instructions.setHasFixedSize(true);
+         //   recycler_meal_instructions.setHasFixedSize(true);
             recycler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.VERTICAL, false));
             instructionsAdapter = new InstructionsAdapter(RecipeDetailsActivity.this, response);
             recycler_meal_instructions.setAdapter(instructionsAdapter);
