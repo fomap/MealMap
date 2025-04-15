@@ -41,9 +41,6 @@
 
             />
 
-<!--        android:theme="@style/AppTheme.NoActionBar"-->
-
-
         <activity
             android:name=".RecipeDetailsActivity"
             android:exported="false"
@@ -53,14 +50,6 @@
             android:name=".MainActivity"
             android:exported="false"
             android:launchMode="singleTop">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-
         </activity>
         <activity
             android:name=".Auth.LoginActivity"

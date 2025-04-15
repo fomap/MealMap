@@ -1,6 +1,7 @@
 package com.example.mealmap.GroceryList;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.example.mealmap.Adapters.GroceryAdapter;
@@ -10,6 +11,8 @@ import com.example.mealmap.Models.ExtendedIngredient;
 import com.example.mealmap.Playlist.PlaylistActivity;
 import com.example.mealmap.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,13 +51,18 @@ public class GroceryListActivity extends AppCompatActivity implements GrocerySel
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new GroceryAdapter(new ArrayList<>(), this);
+
+        List<ExtendedIngredient> savedIngredients = loadGroceriesFromPrefs();
+        adapter = new GroceryAdapter(savedIngredients, this);
         recyclerView.setAdapter(adapter);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         setupBottomNavigation();
 
-//        showSelectionDialog();
+        if (savedIngredients.isEmpty()) {
+            showSelectionDialog();
+        }
+
 
     }
 
@@ -72,32 +81,43 @@ public class GroceryListActivity extends AppCompatActivity implements GrocerySel
                 targetActivity = MealPlanningActivity.class;
             }
 
-            if (targetActivity != null && !this.getClass().equals(targetActivity)) {
-                navigateToActivity(targetActivity);
+            if (targetActivity != null) {
+                Intent intent = new Intent(getApplicationContext(), targetActivity);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                overridePendingTransition(0, 0);
             }
             return true;
         });
 
     }
-
-    private void navigateToActivity(Class<?> targetActivity) {
-        Intent intent = new Intent(this, targetActivity);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
-                Intent.FLAG_ACTIVITY_SINGLE_TOP |
-                Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        overridePendingTransition(0, 0);
-    }
-
     private void showSelectionDialog() {
         GrocerySelectorDialog dialog = new GrocerySelectorDialog();
         dialog.show(getSupportFragmentManager(), "grocery_selector");
     }
 
+    private List<ExtendedIngredient> loadGroceriesFromPrefs() {
+        SharedPreferences prefs = getSharedPreferences("grocery_data", MODE_PRIVATE);
+        String json = prefs.getString("saved_ingredients", null);
+        if (json != null) {
+            Type type = new TypeToken<List<ExtendedIngredient>>() {}.getType();
+            return new Gson().fromJson(json, type);
+        }
+        return new ArrayList<>();
+    }
     @Override
     public void onGroceryListGenerated(List<ExtendedIngredient> ingredients) {
-        adapter.updateList(new ArrayList<>());
+        saveGroceriesToPrefs(ingredients);
         updateUI(ingredients);
+    }
+
+    private void saveGroceriesToPrefs(List<ExtendedIngredient> list) {
+        SharedPreferences prefs = getSharedPreferences("grocery_data", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        prefs.edit().putString("saved_ingredients", json).apply();
     }
 
     private void updateUI(List<ExtendedIngredient> ingredients) {
@@ -110,12 +130,13 @@ public class GroceryListActivity extends AppCompatActivity implements GrocerySel
             adapter.updateList(ingredients);
         }
     }
-    private void showLoading(boolean isLoading) {
-        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        List<ExtendedIngredient> savedIngredients = loadGroceriesFromPrefs();
+        updateUI(savedIngredients);
     }
-
-
-
 }
 
