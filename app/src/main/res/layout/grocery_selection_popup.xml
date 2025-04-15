@@ -14,6 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="SELECT SOURCES FOR GROCERY LIST"
+            android:textAlignment="center"
             android:fontFamily="@font/sfprodisplayregular"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -70,15 +71,6 @@
 
 
 
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Select Playlists:"-->
-<!--            android:textSize="18sp"-->
-<!--            android:textStyle="bold"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:layout_marginBottom="8dp"/>-->
-
         <LinearLayout
             android:id="@+id/linearLayout_playlist"
             android:layout_width="match_parent"
@@ -87,12 +79,14 @@
 
         <Button
             android:id="@+id/btn_generate"
-            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:text="GENERATE GROCERY LIST"
             android:textColor="@color/white"
             android:textSize="15sp"
-            android:background="@color/black" />
+            android:background="@color/black"
+            android:layout_marginTop="10dp"/>
 
     </LinearLayout>
 </ScrollView>

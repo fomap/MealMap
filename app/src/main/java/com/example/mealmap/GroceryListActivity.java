@@ -82,7 +82,7 @@ public class GroceryListActivity extends AppCompatActivity implements GrocerySel
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         setupBottomNavigation();
 
-        showSelectionDialog();
+//        showSelectionDialog();
 
     }
 

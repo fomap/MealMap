@@ -56,7 +56,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Log in"
+                        android:text="Log In"
                         android:textSize="22sp"
                         android:textAlignment="center"
                         android:layout_marginBottom="12dp"/>
@@ -112,10 +112,17 @@
                         android:backgroundTint="@color/black"/>
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/forgot_password"
+                        android:text="Forgot password?"
+                        android:layout_gravity="center"/>
+
+                    <TextView
                         android:id="@+id/textView_signUpRedirect"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Already an user? Sign up"
+                        android:text="Don't have an account? Sign up"
                         android:textSize="14sp"
                         android:layout_gravity="center"
                         android:padding="6dp"
