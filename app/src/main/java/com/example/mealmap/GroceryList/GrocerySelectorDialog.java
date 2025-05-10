@@ -10,25 +10,21 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import com.example.mealmap.Listeners.RecipeDetailsListener;
+import com.example.mealmap.Models.Metric;
 import com.example.mealmap.Models.RecipeDetailsResponse;
 import com.example.mealmap.R;
 import com.example.mealmap.RequestManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-
 import com.example.mealmap.Models.ExtendedIngredient;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 
 public class GrocerySelectorDialog extends DialogFragment {
     private CheckBox[] dayCheckboxes;
@@ -44,7 +43,6 @@ public class GrocerySelectorDialog extends DialogFragment {
     private String UID;
     private RequestManager requestManager;
     private ProgressDialog progressDialog;
-
     public interface GrocerySelectionListener {
         void onGroceryListGenerated(List<ExtendedIngredient> combinedIngredients);
     }
@@ -56,14 +54,12 @@ public class GrocerySelectorDialog extends DialogFragment {
             listener = (GrocerySelectionListener) context;
         }
     }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.grocery_selection_popup, null);
-
         setupViews(view);
         loadPlaylists();
         setupGenerateButton(view);
@@ -73,7 +69,6 @@ public class GrocerySelectorDialog extends DialogFragment {
 
         return builder.create();
     }
-
     private void setupViews(View view) {
         dayCheckboxes = new CheckBox[]{
                 view.findViewById(R.id.chk_mon),
@@ -91,11 +86,9 @@ public class GrocerySelectorDialog extends DialogFragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) UID = user.getUid();
     }
-
     private void loadPlaylists() {
         DatabaseReference playlistsRef = FirebaseDatabase.getInstance().getReference()
                 .child("users").child(UID).child("playlists");
-
         playlistsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -104,7 +97,6 @@ public class GrocerySelectorDialog extends DialogFragment {
                     addPlaylistCheckbox(playlistName);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(requireContext(), "Playlist load failed", Toast.LENGTH_SHORT).show();
@@ -119,24 +111,17 @@ public class GrocerySelectorDialog extends DialogFragment {
         cb.setPadding(0, 8, 0, 8);
         playlistContainer.addView(cb);
     }
-
-
-
     private void setupGenerateButton(View view) {
         view.findViewById(R.id.btn_generate).setOnClickListener(v -> {
             Set<Integer> recipeIds = new HashSet<>();
             Map<String, ExtendedIngredient> combinedIngredients = new HashMap<>();
-
             showProgressDialog();
-
             List<String> selectedDays = getSelectedDays();
             List<String> selectedPlaylists = getSelectedPlaylists();
-
             AtomicInteger pendingSources = new AtomicInteger(
                     selectedDays.size() + selectedPlaylists.size()
             );
             AtomicInteger pendingRecipes = new AtomicInteger(0);
-
             Runnable checkCompletion = () -> {
                 if (pendingSources.get() == 0 && pendingRecipes.get() == 0) {
                     requireActivity().runOnUiThread(() -> {
@@ -153,7 +138,6 @@ public class GrocerySelectorDialog extends DialogFragment {
                     });
                 }
             };
-
 
             for (String day : selectedDays) {
                 fetchRecipesFromPath("mealPlan/" + day, recipeIds,
@@ -192,18 +176,17 @@ public class GrocerySelectorDialog extends DialogFragment {
                     recipeIds.addAll(batchIds);
                 }
 
-                // Track recipes from source
+                // Track recipes from src
                 pendingRecipes.addAndGet(batchIds.size());
 
-                // Process recipes even if empty list
+                // Process recipes even if empty
                 fetchIngredientsForBatch(batchIds, combinedIngredients,
                         pendingRecipes, checkCompletion);
 
-                // Mark source as processed
+                // Mark src as processed
                 pendingSources.decrementAndGet();
                 checkCompletion.run();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 pendingSources.decrementAndGet();
@@ -220,7 +203,6 @@ public class GrocerySelectorDialog extends DialogFragment {
             checkCompletion.run();
             return;
         }
-
         for (Integer id : recipeIds) {
             requestManager.getRecipeDetails(new RecipeDetailsListener() {
                 @Override
@@ -229,7 +211,6 @@ public class GrocerySelectorDialog extends DialogFragment {
                     pendingRecipes.decrementAndGet();
                     checkCompletion.run();
                 }
-
                 @Override
                 public void didError(String message) {
                     pendingRecipes.decrementAndGet();
@@ -242,38 +223,42 @@ public class GrocerySelectorDialog extends DialogFragment {
     private void combineIngredients(List<ExtendedIngredient> ingredients,
                                     Map<String, ExtendedIngredient> combined) {
         for (ExtendedIngredient ingredient : ingredients) {
-            String key = ingredient.name.toLowerCase() + "|" + ingredient.unit.toLowerCase();
+            if (ingredient.getMeasures() == null || ingredient.getMeasures().getMetric() == null) {
+                continue;
+            }
+
+            Metric metric = ingredient.getMeasures().getMetric();
+            double amount = metric.getAmount();
+            String unit = metric.getUnitShort() != null ? metric.getUnitShort().toLowerCase() : "";
+
+            if (unit.isEmpty()) continue;
+
+            String key = ingredient.getName().toLowerCase() + "|" + unit;
 
             if (combined.containsKey(key)) {
                 ExtendedIngredient existing = combined.get(key);
-                existing.amount += ingredient.amount;
+                existing.setAmount(existing.getAmount() + amount);
             } else {
-                combined.put(key, ingredient);
+                ExtendedIngredient clone = cloneIngredient(ingredient);
+                clone.setAmount(amount);
+                clone.setUnit(unit);
+                combined.put(key, clone);
             }
         }
     }
-
-//    private void checkCompletion(AtomicInteger counter,
-//                                 Map<String, ExtendedIngredient> ingredients) {
-//        if (counter.get() == 0) {
-//            requireActivity().runOnUiThread(() -> {
-//                progressDialog.dismiss();
-//                if (listener != null) {
-//                    listener.onGroceryListGenerated(new ArrayList<>(ingredients.values()));
-//                }
-//                dismiss();
-//            });
-//        }
-//    }
-
+    private ExtendedIngredient cloneIngredient(ExtendedIngredient original) {
+        ExtendedIngredient cloned = new ExtendedIngredient();
+        cloned.setName(original.getName());
+        cloned.setMeasures(original.getMeasures()); // Preserve og data
+        cloned.setUnit(original.getUnit()); // Og unit
+        return cloned;
+    }
     private void showProgressDialog() {
         progressDialog = new ProgressDialog(requireContext());
         progressDialog.setMessage("Combining ingredients...");
         progressDialog.setCancelable(false);
         progressDialog.show();
     }
-
-
     private List<String> getSelectedDays() {
         List<String> selected = new ArrayList<>();
         String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday",
@@ -285,7 +270,6 @@ public class GrocerySelectorDialog extends DialogFragment {
         }
         return selected;
     }
-
     private List<String> getSelectedPlaylists() {
         List<String> selected = new ArrayList<>();
         for (int i = 0; i < playlistContainer.getChildCount(); i++) {
@@ -296,7 +280,6 @@ public class GrocerySelectorDialog extends DialogFragment {
         }
         return selected;
     }
-
     @Override
     public void onDestroyView() {
         if (progressDialog != null && progressDialog.isShowing()) {

@@ -5,26 +5,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.mealmap.Listeners.RecipeClickListener;
 import com.example.mealmap.Models.Recipe;
 import com.example.mealmap.R;
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
 
 public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHolder> {
-
     Context context;
     List<Recipe> list;
     RecipeClickListener listener;
-
-
     public RandomRecipeAdapter(Context context, List<Recipe> list, RecipeClickListener listener) {
         this.context = context;
         this.list = list;
@@ -56,11 +49,8 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
 
 
 class RandomRecipeViewHolder extends RecyclerView.ViewHolder{
-
     CardView random_list_container;
     ImageView imageView_food;
-
-
     public RandomRecipeViewHolder(@NonNull View itemView) {
         super(itemView);
         random_list_container = itemView.findViewById(R.id.random_list_container);

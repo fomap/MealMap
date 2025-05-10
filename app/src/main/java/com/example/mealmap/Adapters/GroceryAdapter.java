@@ -3,21 +3,15 @@ package com.example.mealmap.Adapters;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.mealmap.Models.ExtendedIngredient;
 import com.example.mealmap.R;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,13 +19,10 @@ import java.util.Locale;
 import java.util.Set;
 
 public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
-
     private Context context;
     private List<ExtendedIngredient> groceries;
     private Set<String> checkedItems = new HashSet<>();
     private SharedPreferences sharedPreferences;
-
-
     public GroceryAdapter(List<ExtendedIngredient> groceries, Context context) {
         this.context = context;
         this.groceries = groceries;
@@ -39,7 +30,6 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
         loadCheckedStates();
         setHasStableIds(true);
     }
-
     private void loadCheckedStates() {
         checkedItems.addAll(sharedPreferences.getStringSet("checked_items", new HashSet<>()));
     }
@@ -60,16 +50,12 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
     public void onBindViewHolder(@NonNull GroceryViewHolder holder, int position) {
         ExtendedIngredient ingredient = groceries.get(position);
         String uniqueKey = ingredient.name + "|" + ingredient.amount + "|" + ingredient.unit;
-
         String quantity = formatQuantity(ingredient);
-
         holder.name.setText(ingredient.name);
         holder.amount.setText(quantity);
-
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(checkedItems.contains(uniqueKey));
         applyStrikeThrough(holder, checkedItems.contains(uniqueKey));
-
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             String currentKey = ingredient.name + "|" + ingredient.amount + "|" + ingredient.unit;
             if (isChecked) {
@@ -81,7 +67,6 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
             saveCheckedStates();
         });
     }
-
     private void applyStrikeThrough(GroceryViewHolder holder, boolean isChecked) {
         if (isChecked) {
             holder.name.setPaintFlags(holder.name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -91,7 +76,6 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
             holder.amount.setPaintFlags(holder.amount.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
     }
-
     private String formatQuantity(ExtendedIngredient ingredient) {
         if (ingredient.amount == (int) ingredient.amount) {
             return String.format(Locale.getDefault(), "%d %s", (int) ingredient.amount, ingredient.unit);
@@ -103,22 +87,18 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
     public int getItemCount() {
         return groceries.size();
     }
-
     @Override
     public long getItemId(int position) {
         return groceries.get(position).id;
     }
-
     public void updateList(List<ExtendedIngredient> newList) {
         groceries = new ArrayList<>(newList);
         notifyDataSetChanged();
     }
 }
-
 class GroceryViewHolder extends RecyclerView.ViewHolder {
     CheckBox checkBox;
     TextView name, amount;
-
     public GroceryViewHolder(@NonNull View itemView) {
         super(itemView);
         checkBox = itemView.findViewById(R.id.check_ingredient);

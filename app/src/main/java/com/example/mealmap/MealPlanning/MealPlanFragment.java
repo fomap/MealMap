@@ -31,15 +31,10 @@ public class MealPlanFragment extends Fragment {
     private LinearLayout mealsContainer;
     private String day;
     private DatabaseReference mealsRef;
-
     private static final String ARG_COLLECTION_TYPE = "collectionType";
     private static final String ARG_COLLECTION_KEY = "collectionKey";
-
     private String collectionType;
     private String collectionKey;
-
-
-
     public static MealPlanFragment newInstance(String collectionType, String collectionKey) {
         MealPlanFragment fragment = new MealPlanFragment();
         Bundle args = new Bundle();
@@ -56,7 +51,6 @@ public class MealPlanFragment extends Fragment {
             collectionType = getArguments().getString(ARG_COLLECTION_TYPE);
             collectionKey = getArguments().getString(ARG_COLLECTION_KEY);
         }
-
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             mealsRef = FirebaseDatabase.getInstance().getReference()
@@ -67,7 +61,6 @@ public class MealPlanFragment extends Fragment {
         }
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -76,21 +69,14 @@ public class MealPlanFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_meal_plan, container, false);
     }
 
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
         btnClear = view.findViewById(R.id.btn_clear);
         mealsContainer = view.findViewById(R.id.mealsContainer);
-
         btnClear.setOnClickListener(v -> clearAllRecipes());
         setupMealsListener();
     }
-
-
     private void clearAllRecipes() {
         mealsRef.removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -99,13 +85,11 @@ public class MealPlanFragment extends Fragment {
             }
         });
     }
-
     private void setupMealsListener() {
         mealsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!isAdded() || getContext() == null) return;
-
                 mealsContainer.removeAllViews();
                 for (DataSnapshot mealSnapshot : snapshot.getChildren()) {
                     addMealView(mealSnapshot);

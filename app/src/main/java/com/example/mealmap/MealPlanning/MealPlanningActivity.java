@@ -11,17 +11,13 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayoutMediator;
-
 import java.util.Arrays;
 
 
 public class MealPlanningActivity extends AppCompatActivity {
-
-
     TabLayout tabLayout;
     ViewPager2 viewPager2;
     BottomNavigationView bottomNavigationView;
-
     private final String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday",
             "Friday", "Saturday", "Sunday"};
 
@@ -29,12 +25,9 @@ public class MealPlanningActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meal_planning);
-
         viewPager2 = findViewById(R.id.viewpager);
         tabLayout = findViewById(R.id.tab_layout);
-
         viewPager2.setAdapter(new ViewPagerAdapter(this, days));
-
 
         new TabLayoutMediator(tabLayout, viewPager2, (tab, position) -> {
             String[] tabDays = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
@@ -49,9 +42,7 @@ public class MealPlanningActivity extends AppCompatActivity {
             }
         }
 
-
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Class<?> targetActivity = null;
@@ -65,7 +56,6 @@ public class MealPlanningActivity extends AppCompatActivity {
             } else if (itemId == R.id.bottomNav_mealPlan) {
                 targetActivity = MealPlanningActivity.class;
             }
-
             if (targetActivity != null) {
                 Intent intent = new Intent(getApplicationContext(), targetActivity);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
@@ -83,9 +73,5 @@ public class MealPlanningActivity extends AppCompatActivity {
         super.onBackPressed();
         moveTaskToBack(true);
     }
-
-//    private void setupViewPager() {
-//        viewPager2.setAdapter(new ViewPagerAdapter(this, days));
-//    }
 
 }

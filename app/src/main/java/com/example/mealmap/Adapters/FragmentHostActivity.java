@@ -1,17 +1,14 @@
 package com.example.mealmap.Adapters;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import com.example.mealmap.MealPlanning.MealPlanFragment;
 import com.example.mealmap.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,10 +20,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class FragmentHostActivity extends AppCompatActivity {
-
     private String currentPlaylistKey;
     private DatabaseReference playlistsRef;
-
     public static final String COLLECTION_TYPE = "collectionType";
     public static final String COLLECTION_KEY = "collectionKey";
 
@@ -45,7 +40,6 @@ public class FragmentHostActivity extends AppCompatActivity {
                     .child("playlists");
         }
 
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -53,13 +47,11 @@ public class FragmentHostActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(currentPlaylistKey);
         }
 
-
         String collectionType = getIntent().getStringExtra(COLLECTION_TYPE);
         String collectionKey = getIntent().getStringExtra(COLLECTION_KEY);
 
         if (savedInstanceState == null) {
             MealPlanFragment fragment = MealPlanFragment.newInstance(collectionType, collectionKey);
-
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, fragment)
                     .commit();
@@ -71,13 +63,11 @@ public class FragmentHostActivity extends AppCompatActivity {
         onBackPressed();
         return true;
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_playlist, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_edit) {
@@ -86,7 +76,6 @@ public class FragmentHostActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     private void showEditNameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Rename Playlist");
@@ -106,9 +95,7 @@ public class FragmentHostActivity extends AppCompatActivity {
     }
 
     private void renamePlaylist(String newName) {
-
         DatabaseReference oldRef = playlistsRef.child(currentPlaylistKey);
-
         playlistsRef.child(newName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -119,7 +106,6 @@ public class FragmentHostActivity extends AppCompatActivity {
                     performRename(oldRef, newName);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(FragmentHostActivity.this,
@@ -129,12 +115,10 @@ public class FragmentHostActivity extends AppCompatActivity {
     }
 
     private void performRename(DatabaseReference oldRef, String newName) {
-
         oldRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 DatabaseReference newRef = playlistsRef.child(newName);
-
                 newRef.setValue(snapshot.getValue(), (error, ref) -> {
                     if (error == null) {
                         oldRef.removeValue().addOnSuccessListener(aVoid -> {
@@ -152,7 +136,6 @@ public class FragmentHostActivity extends AppCompatActivity {
                     }
                 });
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(FragmentHostActivity.this,

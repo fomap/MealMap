@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -15,14 +13,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.mealmap.Adapters.IngredientsAdapter;
 import com.example.mealmap.Adapters.InstructionsAdapter;
 import com.example.mealmap.Listeners.InstructionsListener;
@@ -38,13 +34,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
-
     int id;
     TextView textView_meal_name;
     TextView textView_recipe_type_ready_time;
@@ -61,17 +55,13 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     private String source;
     private String day;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_details);
-
         source = getIntent().getStringExtra("source");
         day = getIntent().getStringExtra("day");
-
         findViews();
-
         id = Integer.parseInt(getIntent().getStringExtra("id"));
 
         manager = new RequestManager(this);
@@ -80,10 +70,8 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading details...");
         dialog.show();
-
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -93,36 +81,29 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         source = getIntent().getStringExtra("source");
         day = getIntent().getStringExtra("day");
 
-
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             UID = currentUser.getUid();
             Toast.makeText(this, "UID: " + UID, Toast.LENGTH_SHORT).show();
         }
-
-
         btn_save_to_collections.setOnClickListener(view -> {
             showSaveDialog();
         });
     }
-
     @Override
     public boolean onSupportNavigateUp() {
         handleBackNavigation();
         return true;
     }
-
     public void onSaveButtonClick(View view) {
         showSaveDialog();
     }
-
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         handleBackNavigation();
     }
-
     private void handleBackNavigation() {
         if ("mealPlan".equals(source) && day != null) {
             Intent intent = new Intent(this, MealPlanningActivity.class);
@@ -134,7 +115,6 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         }
         finish();
     }
-
     public void saveToDP(String dayOfWeek) {
         if (currentRecipeDetails == null) {
             Toast.makeText(this, "Recipe data not loaded yet.", Toast.LENGTH_SHORT).show();
@@ -149,13 +129,10 @@ public class RecipeDetailsActivity extends AppCompatActivity {
                 .child(dayOfWeek)
                 .child(String.valueOf(id));
 
-
-
         Map<String, Object> recipeData = new HashMap<>();
         recipeData.put("id", currentRecipeDetails.id);
         recipeData.put("title", currentRecipeDetails.title);
         recipeData.put("image", currentRecipeDetails.image);
-
 
         dayRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -177,7 +154,6 @@ public class RecipeDetailsActivity extends AppCompatActivity {
                             Toast.makeText(RecipeDetailsActivity.this,
                                     "Added to " + dayOfWeek,
                                     Toast.LENGTH_SHORT).show();
-
                             Intent resultIntent = new Intent();
                             resultIntent.putExtra("newRecipeKey", id);
                             setResult(RESULT_OK, resultIntent);
@@ -189,13 +165,10 @@ public class RecipeDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle possible errors
+                // possible errors????
             }
         });
-
     }
-
-
 private void showSaveDialog() {
     Dialog dialog = new Dialog(this);
     dialog.setContentView(R.layout.collection_selection_popup);
@@ -205,9 +178,7 @@ private void showSaveDialog() {
 
     Button btnCreate = dialog.findViewById(R.id.btn_create_playlist);
     btnCreate.setOnClickListener(v -> showCreatePlaylistDialog(playlistLayout));
-
     mealPlanLayout.removeAllViews();
-
     String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday",
             "Friday", "Saturday", "Sunday"};
     for (String day : days) {
@@ -219,20 +190,14 @@ private void showSaveDialog() {
         ));
         mealPlanLayout.addView(cb);
     }
-
-
     loadPlaylists(playlistLayout);
-
     dialog.findViewById(R.id.btn_save).setOnClickListener(v -> {
         saveSelectedCollections(mealPlanLayout, playlistLayout);
         dialog.dismiss();
     });
-
     dialog.show();
 }
-
     private void saveSelectedCollections(LinearLayout mealPlanLayout, LinearLayout playlistLayout) {
-
         for (int i = 0; i < mealPlanLayout.getChildCount(); i++) {
             CheckBox cb = (CheckBox) mealPlanLayout.getChildAt(i);
             if (cb.isChecked()) {
@@ -279,7 +244,6 @@ private void showSaveDialog() {
     private void showCreatePlaylistDialog(LinearLayout playlistLayout) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New Playlist");
-
         final EditText input = new EditText(this);
         input.setHint("Enter playlist name");
         builder.setView(input);
@@ -293,7 +257,6 @@ private void showSaveDialog() {
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
-
     private void createPlaylist(String playlistName, LinearLayout playlistLayout) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || playlistName.isEmpty()) return;
@@ -303,7 +266,6 @@ private void showSaveDialog() {
                 .child(user.getUid())
                 .child("playlists")
                 .child(playlistName);
-
 
         playlistsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -333,9 +295,7 @@ private void showSaveDialog() {
     }
 
     public void saveToCollection(String collectionType, String collectionKey) {
-
         String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
                 .child("users")
                 .child(UID)
@@ -351,13 +311,11 @@ private void showSaveDialog() {
                     recipeData.put("id", currentRecipeDetails.id);
                     recipeData.put("title", currentRecipeDetails.title);
                     recipeData.put("image", currentRecipeDetails.image);
-
                     ref.setValue(recipeData)
                             .addOnSuccessListener(aVoid -> showSaveSuccess(collectionKey))
                             .addOnFailureListener(e -> showError(e));
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 showError(error.toException());
@@ -369,21 +327,15 @@ private void showSaveDialog() {
         String message = "Recipe saved to " + collectionName;
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
-
-
     private void showError(Exception e) {
         Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         Log.e("SAVE_RECIPE", "Error saving recipe", e);
     }
-
-
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
         @Override
         public void didFetch(RecipeDetailsResponse response, String message) {
             dialog.dismiss();
             currentRecipeDetails = response;
-
-
             textView_meal_name.setText(response.title);
             Picasso.get().load(response.image).into(imageView_mealImage);
             String mealType;
@@ -392,13 +344,11 @@ private void showSaveDialog() {
             } else {
                 mealType = "Meal";
             }
-
             String readyTime = response.readyInMinutes + " minutes";
             textView_recipe_type_ready_time.setText(mealType + " • " + readyTime);
             recycler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this));
             ingredientsAdapter = new IngredientsAdapter(RecipeDetailsActivity.this, response.extendedIngredients);
             recycler_meal_ingredients.setAdapter(ingredientsAdapter);
-
         }
         @Override
         public void didError(String message) {
@@ -417,15 +367,12 @@ private void showSaveDialog() {
     private final InstructionsListener instructionsListener = new InstructionsListener() {
         @Override
         public void didFetch(List<InstructionsResponse> response, String message) {
-
-         //   recycler_meal_instructions.setHasFixedSize(true);
             recycler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.VERTICAL, false));
             instructionsAdapter = new InstructionsAdapter(RecipeDetailsActivity.this, response);
             recycler_meal_instructions.setAdapter(instructionsAdapter);
         }
         @Override
         public void didError(String message) {
-
         }
     };
 }

@@ -1,6 +1,5 @@
 package com.example.mealmap;
 
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.example.mealmap.Adapters.RandomRecipeAdapter;
 import com.example.mealmap.GroceryList.GroceryListActivity;
 import com.example.mealmap.Listeners.RandomRecipeResponseListener;
@@ -18,17 +16,14 @@ import com.example.mealmap.MealPlanning.MealPlanningActivity;
 import com.example.mealmap.Models.RandomRecipeApiResponse;
 import com.example.mealmap.Playlist.PlaylistActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
     ProgressDialog dialog;
     RequestManager manager;
     RandomRecipeAdapter randomRecipeAdapter;
@@ -36,14 +31,12 @@ public class MainActivity extends AppCompatActivity {
     Spinner spinner;
     List<String> tags = new ArrayList<>();
     SearchView searchView;
-
     BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         recyclerView = findViewById(R.id.recycler_random);
 
         dialog = new ProgressDialog(this);
@@ -59,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -76,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
         arrayAdapter.setDropDownViewResource(R.layout.spinner_inner_text);
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(spinnerSelectedListener);
-
         manager = new RequestManager(this);
 
         bottomNav = findViewById(R.id.bottomNavigationView);
@@ -106,20 +97,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         moveTaskToBack(true);
     }
-
-
     private final RandomRecipeResponseListener randomRecipeResponseListener = new RandomRecipeResponseListener() {
-
-
         @Override
         public void didFetch(RandomRecipeApiResponse response, String message) {
-
           dialog.dismiss();
           recyclerView.findViewById(R.id.recycler_random);
           recyclerView.setHasFixedSize(true);
@@ -127,13 +112,11 @@ public class MainActivity extends AppCompatActivity {
           randomRecipeAdapter = new RandomRecipeAdapter(MainActivity.this, response.recipes, recipeClickListener);
           recyclerView.setAdapter(randomRecipeAdapter);
         }
-
         @Override
         public void didError(String message) {
             Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
         }
     };
-
     private final AdapterView.OnItemSelectedListener spinnerSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -142,11 +125,8 @@ public class MainActivity extends AppCompatActivity {
             manager.getRandomRecipes(randomRecipeResponseListener, tags);
             dialog.show();
         }
-
         @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-
-        }
+        public void onNothingSelected(AdapterView<?> adapterView) {}
     };
 
     private final RecipeClickListener recipeClickListener = new RecipeClickListener() {
