@@ -20,4 +20,12 @@ public class Metric {
     public void setUnitShort(String unitShort) {
         this.unitShort = unitShort;
     }
+
+    public String getUnitLong() {
+        return unitLong;
+    }
+
+    public void setUnitLong(String unitLong) {
+        this.unitLong = unitLong;
+    }
 }

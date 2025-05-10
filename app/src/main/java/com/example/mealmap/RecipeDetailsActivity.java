@@ -84,7 +84,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             UID = currentUser.getUid();
-            Toast.makeText(this, "UID: " + UID, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "UID: " + UID, Toast.LENGTH_SHORT).show();
         }
         btn_save_to_collections.setOnClickListener(view -> {
             showSaveDialog();
@@ -115,60 +115,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         }
         finish();
     }
-    public void saveToDP(String dayOfWeek) {
-        if (currentRecipeDetails == null) {
-            Toast.makeText(this, "Recipe data not loaded yet.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference dayRef = FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(user.getUid())
-                .child("MealPlan")
-                .child(dayOfWeek)
-                .child(String.valueOf(id));
-
-        Map<String, Object> recipeData = new HashMap<>();
-        recipeData.put("id", currentRecipeDetails.id);
-        recipeData.put("title", currentRecipeDetails.title);
-        recipeData.put("image", currentRecipeDetails.image);
-
-        dayRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Toast.makeText(RecipeDetailsActivity.this,
-                            "Recipe already exists in " + dayOfWeek,
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Map<String, Object> recipeData = new HashMap<>();
-                recipeData.put("id", currentRecipeDetails.id);
-                recipeData.put("title", currentRecipeDetails.title);
-                recipeData.put("image", currentRecipeDetails.image);
-
-                dayRef.setValue(recipeData)
-                        .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(RecipeDetailsActivity.this,
-                                    "Added to " + dayOfWeek,
-                                    Toast.LENGTH_SHORT).show();
-                            Intent resultIntent = new Intent();
-                            resultIntent.putExtra("newRecipeKey", id);
-                            setResult(RESULT_OK, resultIntent);
-                        })
-                        .addOnFailureListener(e -> {
-                           Toast.makeText(RecipeDetailsActivity.this,"Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        });
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // possible errors????
-            }
-        });
-    }
 private void showSaveDialog() {
     Dialog dialog = new Dialog(this);
     dialog.setContentView(R.layout.collection_selection_popup);
@@ -311,6 +258,7 @@ private void showSaveDialog() {
                     recipeData.put("id", currentRecipeDetails.id);
                     recipeData.put("title", currentRecipeDetails.title);
                     recipeData.put("image", currentRecipeDetails.image);
+                    recipeData.put("portions", 1);
                     ref.setValue(recipeData)
                             .addOnSuccessListener(aVoid -> showSaveSuccess(collectionKey))
                             .addOnFailureListener(e -> showError(e));

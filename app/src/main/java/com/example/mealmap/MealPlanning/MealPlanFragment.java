@@ -35,6 +35,7 @@ public class MealPlanFragment extends Fragment {
     private static final String ARG_COLLECTION_KEY = "collectionKey";
     private String collectionType;
     private String collectionKey;
+    private TextView txtEmpty;
     public static MealPlanFragment newInstance(String collectionType, String collectionKey) {
         MealPlanFragment fragment = new MealPlanFragment();
         Bundle args = new Bundle();
@@ -72,6 +73,7 @@ public class MealPlanFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        txtEmpty = view.findViewById(R.id.txt_empty);
         btnClear = view.findViewById(R.id.btn_clear);
         mealsContainer = view.findViewById(R.id.mealsContainer);
         btnClear.setOnClickListener(v -> clearAllRecipes());
@@ -90,12 +92,20 @@ public class MealPlanFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!isAdded() || getContext() == null) return;
+
                 mealsContainer.removeAllViews();
-                for (DataSnapshot mealSnapshot : snapshot.getChildren()) {
-                    addMealView(mealSnapshot);
+
+                if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
+                    txtEmpty.setVisibility(View.VISIBLE);
+                    mealsContainer.setVisibility(View.GONE);
+                } else {
+                    txtEmpty.setVisibility(View.GONE);
+                    mealsContainer.setVisibility(View.VISIBLE);
+                    for (DataSnapshot mealSnapshot : snapshot.getChildren()) {
+                        addMealView(mealSnapshot);
+                    }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
@@ -117,6 +127,10 @@ public class MealPlanFragment extends Fragment {
         Button btnDelete = mealView.findViewById(R.id.btn_delete);
         Button btnDetails = mealView.findViewById(R.id.btn_details);
 
+        TextView tvPortions = mealView.findViewById(R.id.tv_portions);
+        Button btnIncrease = mealView.findViewById(R.id.btn_increase);
+        Button btnDecrease = mealView.findViewById(R.id.btn_decrease);
+
         String mealTitle = mealSnapshot.child("title").getValue(String.class);
         String imageUrl = mealSnapshot.child("image").getValue(String.class);
         String pushKey = mealSnapshot.getKey();
@@ -130,6 +144,15 @@ public class MealPlanFragment extends Fragment {
                         mealsContainer.removeView(mealView);
                         Toast.makeText(getContext(), "Meal removed", Toast.LENGTH_SHORT).show();
                     });
+        });
+
+        Long portionsLong = mealSnapshot.child("portions").getValue(Long.class);
+        int portions = (portionsLong != null) ? portionsLong.intValue() : 1;
+        tvPortions.setText(String.valueOf(portions));
+
+        btnIncrease.setOnClickListener(v -> updatePortions(mealSnapshot.getKey(), portions + 1));
+        btnDecrease.setOnClickListener(v -> {
+            if (portions > 1) updatePortions(mealSnapshot.getKey(), portions - 1);
         });
 
         btnDetails.setOnClickListener(view -> {
@@ -149,6 +172,10 @@ public class MealPlanFragment extends Fragment {
         mealsContainer.addView(mealView);
     }
 
+    private void updatePortions(String recipeKey, int newPortions) {
+        mealsRef.child(recipeKey).child("portions").setValue(newPortions)
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show());
+    }
 
     public void refreshReference(String newCollectionKey) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

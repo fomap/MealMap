@@ -102,6 +102,7 @@ public class GroceryListActivity extends AppCompatActivity implements GrocerySel
     }
     @Override
     public void onGroceryListGenerated(List<ExtendedIngredient> ingredients) {
+        saveGroceriesToPrefs(new ArrayList<>());
         saveGroceriesToPrefs(ingredients);
         updateUI(ingredients);
     }
@@ -157,5 +158,7 @@ public class GroceryListActivity extends AppCompatActivity implements GrocerySel
         sb.append("\nGenerated via MealMap ♥");
         return sb.toString();
     }
+
+
 }
 

@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import com.example.mealmap.Listeners.RecipeDetailsListener;
+import com.example.mealmap.Models.Measures;
 import com.example.mealmap.Models.Metric;
 import com.example.mealmap.Models.RecipeDetailsResponse;
 import com.example.mealmap.R;
@@ -113,19 +114,23 @@ public class GrocerySelectorDialog extends DialogFragment {
     }
     private void setupGenerateButton(View view) {
         view.findViewById(R.id.btn_generate).setOnClickListener(v -> {
-            Set<Integer> recipeIds = new HashSet<>();
+            Set<Integer> uniqueRecipeIds = new HashSet<>();
+            Map<Integer, Integer> recipePortions = new HashMap<>();
             Map<String, ExtendedIngredient> combinedIngredients = new HashMap<>();
             showProgressDialog();
             List<String> selectedDays = getSelectedDays();
             List<String> selectedPlaylists = getSelectedPlaylists();
+
             AtomicInteger pendingSources = new AtomicInteger(
                     selectedDays.size() + selectedPlaylists.size()
             );
             AtomicInteger pendingRecipes = new AtomicInteger(0);
+
             Runnable checkCompletion = () -> {
                 if (pendingSources.get() == 0 && pendingRecipes.get() == 0) {
                     requireActivity().runOnUiThread(() -> {
                         progressDialog.dismiss();
+                        dismiss();
                         if (combinedIngredients.isEmpty()) {
                             Toast.makeText(requireContext(),
                                     "No recipes found in selected sources",
@@ -140,19 +145,19 @@ public class GrocerySelectorDialog extends DialogFragment {
             };
 
             for (String day : selectedDays) {
-                fetchRecipesFromPath("mealPlan/" + day, recipeIds,
+                fetchRecipesFromPath("mealPlan/" + day, uniqueRecipeIds, recipePortions,
                         pendingSources, pendingRecipes, combinedIngredients, checkCompletion);
             }
 
             for (String playlist : selectedPlaylists) {
-                fetchRecipesFromPath("playlists/" + playlist, recipeIds,
+                fetchRecipesFromPath("playlists/" + playlist, uniqueRecipeIds, recipePortions,
                         pendingSources, pendingRecipes, combinedIngredients, checkCompletion);
             }
         });
     }
-
     private void fetchRecipesFromPath(String path,
-                                      Set<Integer> recipeIds,
+                                      Set<Integer> uniqueRecipeIds,
+                                      Map<Integer, Integer> recipePortions,
                                       AtomicInteger pendingSources,
                                       AtomicInteger pendingRecipes,
                                       Map<String, ExtendedIngredient> combinedIngredients,
@@ -166,27 +171,37 @@ public class GrocerySelectorDialog extends DialogFragment {
                 List<Integer> batchIds = new ArrayList<>();
                 for (DataSnapshot recipeSnapshot : snapshot.getChildren()) {
                     Map<String, Object> recipeData = (Map<String, Object>) recipeSnapshot.getValue();
+
+
                     Long idLong = (Long) recipeData.get("id");
+                    Long portionsLong = (Long) recipeData.get("portions");
+                    int portions = portionsLong != null ? portionsLong.intValue() : 1;
+
                     if (idLong != null) {
-                        batchIds.add(idLong.intValue());
+                        int recipeId = idLong.intValue();
+                        batchIds.add(recipeId);
+
+                        // Accumulate portions from all sources
+                        int totalPortions = recipePortions.getOrDefault(recipeId, 0) + portions;
+                        recipePortions.put(recipeId, totalPortions);
+
+                        // Track unique recipes and increment pending count only for new ones
+                        if (uniqueRecipeIds.add(recipeId)) {
+                            pendingRecipes.incrementAndGet();
+                        }
                     }
                 }
 
-                synchronized (recipeIds) {
-                    recipeIds.addAll(batchIds);
+                // Process unique recipes
+                if (!batchIds.isEmpty()) {
+                    fetchIngredientsForBatch(new ArrayList<>(uniqueRecipeIds), recipePortions,
+                            combinedIngredients, pendingRecipes, checkCompletion);
                 }
 
-                // Track recipes from src
-                pendingRecipes.addAndGet(batchIds.size());
-
-                // Process recipes even if empty
-                fetchIngredientsForBatch(batchIds, combinedIngredients,
-                        pendingRecipes, checkCompletion);
-
-                // Mark src as processed
                 pendingSources.decrementAndGet();
                 checkCompletion.run();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 pendingSources.decrementAndGet();
@@ -196,6 +211,7 @@ public class GrocerySelectorDialog extends DialogFragment {
     }
 
     private void fetchIngredientsForBatch(List<Integer> recipeIds,
+                                          Map<Integer, Integer> recipePortions,
                                           Map<String, ExtendedIngredient> combinedIngredients,
                                           AtomicInteger pendingRecipes,
                                           Runnable checkCompletion) {
@@ -203,56 +219,84 @@ public class GrocerySelectorDialog extends DialogFragment {
             checkCompletion.run();
             return;
         }
-        for (Integer id : recipeIds) {
+
+        for (Integer recipeId : recipeIds) {
+            int portions = recipePortions.getOrDefault(recipeId, 1);
+
             requestManager.getRecipeDetails(new RecipeDetailsListener() {
                 @Override
                 public void didFetch(RecipeDetailsResponse response, String message) {
-                    combineIngredients(response.extendedIngredients, combinedIngredients);
+                    List<ExtendedIngredient> scaledIngredients = new ArrayList<>();
+                    for (ExtendedIngredient ingredient : response.extendedIngredients) {
+                        ExtendedIngredient cloned = cloneIngredient(ingredient);
+                        cloned.setAmount(cloned.getAmount() * portions);
+                        scaledIngredients.add(cloned);
+                    }
+
+                    synchronized (combinedIngredients) {
+                        combineIngredients(scaledIngredients, combinedIngredients);
+                    }
+
                     pendingRecipes.decrementAndGet();
                     checkCompletion.run();
                 }
+
                 @Override
                 public void didError(String message) {
                     pendingRecipes.decrementAndGet();
                     checkCompletion.run();
                 }
-            }, id);
+            }, recipeId);
         }
     }
 
     private void combineIngredients(List<ExtendedIngredient> ingredients,
                                     Map<String, ExtendedIngredient> combined) {
         for (ExtendedIngredient ingredient : ingredients) {
-            if (ingredient.getMeasures() == null || ingredient.getMeasures().getMetric() == null) {
-                continue;
-            }
-
-            Metric metric = ingredient.getMeasures().getMetric();
-            double amount = metric.getAmount();
-            String unit = metric.getUnitShort() != null ? metric.getUnitShort().toLowerCase() : "";
-
-            if (unit.isEmpty()) continue;
-
-            String key = ingredient.getName().toLowerCase() + "|" + unit;
+            // Create fresh objects for each combination
+            ExtendedIngredient processed = processIngredient(ingredient);
+            String key = processed.getName().toLowerCase() + "|" + processed.getUnit().toLowerCase();
 
             if (combined.containsKey(key)) {
                 ExtendedIngredient existing = combined.get(key);
-                existing.setAmount(existing.getAmount() + amount);
+                existing.setAmount(existing.getAmount() + processed.getAmount());
             } else {
-                ExtendedIngredient clone = cloneIngredient(ingredient);
-                clone.setAmount(amount);
-                clone.setUnit(unit);
-                combined.put(key, clone);
+                combined.put(key, processed);
             }
         }
     }
+
+    private ExtendedIngredient processIngredient(ExtendedIngredient original) {
+        ExtendedIngredient cloned = new ExtendedIngredient();
+        cloned.setName(original.getName());
+        cloned.setAmount(original.getAmount());
+        cloned.setUnit(original.getUnit());
+        return cloned;
+    }
+
     private ExtendedIngredient cloneIngredient(ExtendedIngredient original) {
         ExtendedIngredient cloned = new ExtendedIngredient();
         cloned.setName(original.getName());
-        cloned.setMeasures(original.getMeasures()); // Preserve og data
-        cloned.setUnit(original.getUnit()); // Og unit
+        cloned.setAmount(original.getAmount());
+        cloned.setUnit(original.getUnit());
+
+        // Clone measures if needed
+        if (original.getMeasures() != null) {
+            Measures measures = new Measures();
+            measures.setMetric(cloneMetric(original.getMeasures().getMetric()));
+            cloned.setMeasures(measures);
+        }
         return cloned;
     }
+
+    private Metric cloneMetric(Metric original) {
+        Metric metric = new Metric();
+        metric.setAmount(original.getAmount());
+        metric.setUnitShort(original.getUnitShort());
+        metric.setUnitLong(original.getUnitLong());
+        return metric;
+    }
+
     private void showProgressDialog() {
         progressDialog = new ProgressDialog(requireContext());
         progressDialog.setMessage("Combining ingredients...");

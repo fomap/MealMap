@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.example.mealmap.Adapters.RandomRecipeAdapter;
@@ -32,12 +33,17 @@ public class MainActivity extends AppCompatActivity {
     List<String> tags = new ArrayList<>();
     SearchView searchView;
     BottomNavigationView bottomNav;
+    ImageButton btnUserProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recycler_random);
+
+        btnUserProfile = findViewById(R.id.btn_profile);
+        btnUserProfile.setOnClickListener(view -> {
+        });
 
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
@@ -132,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     private final RecipeClickListener recipeClickListener = new RecipeClickListener() {
         @Override
         public void onRecipeClicked(String id) {
-            Toast.makeText(MainActivity.this, id, Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(MainActivity.this, id, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, RecipeDetailsActivity.class)
                     .putExtra("id", id));
         }

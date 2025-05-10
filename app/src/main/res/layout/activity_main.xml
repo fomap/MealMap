@@ -21,13 +21,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/user_icon"
-                android:layout_width="45dp"
+            <ImageButton
+                android:id="@+id/btn_profile"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_user_icon"
                 android:layout_gravity="center"
-                android:padding="0dp"/>
+                android:src="@drawable/ic_user_l"
+                android:background="?attr/selectableItemBackgroundBorderless" />
 
             <Spinner
                 android:id="@+id/spinner_tags"
@@ -70,7 +70,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-
     <FrameLayout
         android:id="@+id/frame_layout"
         android:background="@color/white"
@@ -80,7 +79,6 @@
         app:layout_constraintBottom_toBottomOf="@id/bottomNavigationView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
