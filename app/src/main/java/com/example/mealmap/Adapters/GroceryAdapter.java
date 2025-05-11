@@ -49,24 +49,57 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull GroceryViewHolder holder, int position) {
         ExtendedIngredient ingredient = groceries.get(position);
-        String uniqueKey = ingredient.name + "|" + ingredient.amount + "|" + ingredient.unit;
+
+        String normalizedUnit = normalizeUnit(ingredient.unit);
+        String uniqueKey = ingredient.name.toLowerCase() + "|" + normalizedUnit.toLowerCase();
         String quantity = formatQuantity(ingredient);
+
         holder.name.setText(ingredient.name);
         holder.amount.setText(quantity);
+
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(checkedItems.contains(uniqueKey));
         applyStrikeThrough(holder, checkedItems.contains(uniqueKey));
+
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            String currentKey = ingredient.name + "|" + ingredient.amount + "|" + ingredient.unit;
             if (isChecked) {
-                checkedItems.add(currentKey);
+                checkedItems.add(uniqueKey);
             } else {
-                checkedItems.remove(currentKey);
+                checkedItems.remove(uniqueKey);
             }
             applyStrikeThrough(holder, isChecked);
             saveCheckedStates();
         });
     }
+
+    private String formatQuantity(ExtendedIngredient ingredient) {
+        String displayUnit = normalizeUnit(ingredient.unit);
+
+        // "2 cups" vs "2.0 cups"
+        if (ingredient.amount == (int) ingredient.amount) {
+            return String.format(Locale.getDefault(), "%d %s",
+                    (int) ingredient.amount,
+                    displayUnit);
+        }
+        return String.format(Locale.getDefault(), "%.2f %s",
+                ingredient.amount,
+                displayUnit);
+    }
+
+    private String normalizeUnit(String originalUnit) {
+        if (originalUnit == null) return "";
+
+        return originalUnit.toLowerCase()
+                .replaceAll("s$", "")
+                .replaceAll("\\.$", "")
+                .replace("tbsp", "tablespoon")
+                .replace("tsp", "teaspoon")
+                .replace("servings", "serving")
+                .replace("grams", "gram")
+                .replace("ounces", "ounce")
+                .trim();
+    }
+
     private void applyStrikeThrough(GroceryViewHolder holder, boolean isChecked) {
         if (isChecked) {
             holder.name.setPaintFlags(holder.name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -76,12 +109,8 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryViewHolder> {
             holder.amount.setPaintFlags(holder.amount.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
     }
-    private String formatQuantity(ExtendedIngredient ingredient) {
-        if (ingredient.amount == (int) ingredient.amount) {
-            return String.format(Locale.getDefault(), "%d %s", (int) ingredient.amount, ingredient.unit);
-        }
-        return String.format(Locale.getDefault(), "%.2f %s", ingredient.amount, ingredient.unit);
-    }
+
+
 
     @Override
     public int getItemCount() {

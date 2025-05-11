@@ -3,6 +3,7 @@ package com.example.mealmap.GroceryList;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.icu.util.Measure;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import com.example.mealmap.Listeners.RecipeDetailsListener;
 import com.example.mealmap.Models.Measures;
 import com.example.mealmap.Models.Metric;
 import com.example.mealmap.Models.RecipeDetailsResponse;
+import com.example.mealmap.PreferenceManager;
 import com.example.mealmap.R;
 import com.example.mealmap.RequestManager;
 import com.google.firebase.auth.FirebaseAuth;
@@ -124,177 +126,177 @@ public class GrocerySelectorDialog extends DialogFragment {
             AtomicInteger pendingSources = new AtomicInteger(
                     selectedDays.size() + selectedPlaylists.size()
             );
-            AtomicInteger pendingRecipes = new AtomicInteger(0);
 
-            Runnable checkCompletion = () -> {
-                if (pendingSources.get() == 0 && pendingRecipes.get() == 0) {
-                    requireActivity().runOnUiThread(() -> {
-                        progressDialog.dismiss();
-                        dismiss();
-                        if (combinedIngredients.isEmpty()) {
-                            Toast.makeText(requireContext(),
-                                    "No recipes found in selected sources",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
+            Runnable onAllSourcesProcessed = () -> {
+                if (uniqueRecipeIds.isEmpty()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(requireContext(), "No recipes selected", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                AtomicInteger pendingRecipes = new AtomicInteger(uniqueRecipeIds.size());
+                Runnable checkCompletion = () -> {
+                    if (pendingRecipes.get() == 0) {
+                        requireActivity().runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            dismiss();
                             listener.onGroceryListGenerated(
                                     new ArrayList<>(combinedIngredients.values())
                             );
-                        }
-                    });
+                        });
+                    }
+                };
+
+                for (Integer recipeId : uniqueRecipeIds) {
+                    int portions = recipePortions.getOrDefault(recipeId, 1);
+                    fetchRecipeIngredients(recipeId, portions, combinedIngredients, pendingRecipes, checkCompletion);
                 }
             };
 
+            // Process each source to collect recipes
             for (String day : selectedDays) {
-                fetchRecipesFromPath("mealPlan/" + day, uniqueRecipeIds, recipePortions,
-                        pendingSources, pendingRecipes, combinedIngredients, checkCompletion);
+                fetchRecipesFromPath("mealPlan/" + day, uniqueRecipeIds, recipePortions, pendingSources, onAllSourcesProcessed);
             }
 
             for (String playlist : selectedPlaylists) {
-                fetchRecipesFromPath("playlists/" + playlist, uniqueRecipeIds, recipePortions,
-                        pendingSources, pendingRecipes, combinedIngredients, checkCompletion);
+                fetchRecipesFromPath("playlists/" + playlist, uniqueRecipeIds, recipePortions, pendingSources, onAllSourcesProcessed);
             }
         });
     }
+
+
+
+
+
+
+
+
     private void fetchRecipesFromPath(String path,
                                       Set<Integer> uniqueRecipeIds,
                                       Map<Integer, Integer> recipePortions,
                                       AtomicInteger pendingSources,
-                                      AtomicInteger pendingRecipes,
-                                      Map<String, ExtendedIngredient> combinedIngredients,
-                                      Runnable checkCompletion) {
+                                      Runnable onAllSourcesProcessed) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
                 .child("users").child(UID).child(path);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<Integer> batchIds = new ArrayList<>();
                 for (DataSnapshot recipeSnapshot : snapshot.getChildren()) {
                     Map<String, Object> recipeData = (Map<String, Object>) recipeSnapshot.getValue();
-
-
                     Long idLong = (Long) recipeData.get("id");
                     Long portionsLong = (Long) recipeData.get("portions");
                     int portions = portionsLong != null ? portionsLong.intValue() : 1;
 
                     if (idLong != null) {
                         int recipeId = idLong.intValue();
-                        batchIds.add(recipeId);
-
-                        // Accumulate portions from all sources
-                        int totalPortions = recipePortions.getOrDefault(recipeId, 0) + portions;
-                        recipePortions.put(recipeId, totalPortions);
-
-                        // Track unique recipes and increment pending count only for new ones
-                        if (uniqueRecipeIds.add(recipeId)) {
-                            pendingRecipes.incrementAndGet();
-                        }
+                        uniqueRecipeIds.add(recipeId);
+                        recipePortions.put(recipeId, recipePortions.getOrDefault(recipeId, 0) + portions);
                     }
                 }
 
-                // Process unique recipes
-                if (!batchIds.isEmpty()) {
-                    fetchIngredientsForBatch(new ArrayList<>(uniqueRecipeIds), recipePortions,
-                            combinedIngredients, pendingRecipes, checkCompletion);
-                }
-
                 pendingSources.decrementAndGet();
-                checkCompletion.run();
+                if (pendingSources.get() == 0) {
+                    onAllSourcesProcessed.run();
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 pendingSources.decrementAndGet();
-                checkCompletion.run();
+                if (pendingSources.get() == 0) {
+                    onAllSourcesProcessed.run();
+                }
             }
         });
     }
 
-    private void fetchIngredientsForBatch(List<Integer> recipeIds,
-                                          Map<Integer, Integer> recipePortions,
-                                          Map<String, ExtendedIngredient> combinedIngredients,
-                                          AtomicInteger pendingRecipes,
-                                          Runnable checkCompletion) {
-        if (recipeIds.isEmpty()) {
-            checkCompletion.run();
-            return;
-        }
 
-        for (Integer recipeId : recipeIds) {
-            int portions = recipePortions.getOrDefault(recipeId, 1);
-
-            requestManager.getRecipeDetails(new RecipeDetailsListener() {
-                @Override
-                public void didFetch(RecipeDetailsResponse response, String message) {
-                    List<ExtendedIngredient> scaledIngredients = new ArrayList<>();
-                    for (ExtendedIngredient ingredient : response.extendedIngredients) {
-                        ExtendedIngredient cloned = cloneIngredient(ingredient);
-                        cloned.setAmount(cloned.getAmount() * portions);
-                        scaledIngredients.add(cloned);
-                    }
-
-                    synchronized (combinedIngredients) {
-                        combineIngredients(scaledIngredients, combinedIngredients);
-                    }
-
-                    pendingRecipes.decrementAndGet();
-                    checkCompletion.run();
+    private void fetchRecipeIngredients(int recipeId,
+                                        int portions,
+                                        Map<String, ExtendedIngredient> combinedIngredients,
+                                        AtomicInteger pendingRecipes,
+                                        Runnable checkCompletion) {
+        requestManager.getRecipeDetails(new RecipeDetailsListener() {
+            @Override
+            public void didFetch(RecipeDetailsResponse response, String message) {
+                synchronized (combinedIngredients) {
+                    combineIngredients(response.extendedIngredients, portions, combinedIngredients);
                 }
+                pendingRecipes.decrementAndGet();
+                checkCompletion.run();
+            }
 
-                @Override
-                public void didError(String message) {
-                    pendingRecipes.decrementAndGet();
-                    checkCompletion.run();
-                }
-            }, recipeId);
-        }
+            @Override
+            public void didError(String message) {
+                pendingRecipes.decrementAndGet();
+                checkCompletion.run();
+            }
+        }, recipeId);
     }
 
+
     private void combineIngredients(List<ExtendedIngredient> ingredients,
+                                    int portions,
                                     Map<String, ExtendedIngredient> combined) {
+        Context context = getContext();
+        if (context == null) return;
+
+        boolean useMetric = PreferenceManager.isMetric(context);
+
         for (ExtendedIngredient ingredient : ingredients) {
-            // Create fresh objects for each combination
-            ExtendedIngredient processed = processIngredient(ingredient);
-            String key = processed.getName().toLowerCase() + "|" + processed.getUnit().toLowerCase();
+            double finalAmount;
+            String finalUnit;
+
+            if (useMetric) {
+                if (ingredient.measures != null && ingredient.measures.metric != null) {
+                    finalAmount = ingredient.measures.metric.amount * portions;
+                    finalUnit = normalizeUnit(ingredient.measures.metric.unitShort);
+                } else {
+                    finalAmount = ingredient.amount * portions;
+                    finalUnit = normalizeUnit(ingredient.unit != null ? ingredient.unit : "");
+                }
+            } else { // US Standard
+                if (ingredient.measures != null && ingredient.measures.us != null) {
+                    finalAmount = ingredient.measures.us.amount * portions;
+                    finalUnit = normalizeUnit(ingredient.measures.us.unitShort);
+                } else {
+                    finalAmount = ingredient.amount * portions;
+                    finalUnit = normalizeUnit(ingredient.unit != null ? ingredient.unit : "");
+                }
+            }
+
+            String key = (ingredient.name.toLowerCase().trim() + "|" + finalUnit.toLowerCase().trim()).trim();
 
             if (combined.containsKey(key)) {
                 ExtendedIngredient existing = combined.get(key);
-                existing.setAmount(existing.getAmount() + processed.getAmount());
+                existing.amount += finalAmount;
+                existing.amount = Math.round(existing.amount * 100.0) / 100.0;
             } else {
-                combined.put(key, processed);
+                ExtendedIngredient clone = new ExtendedIngredient();
+                clone.name = ingredient.name.trim();
+                clone.amount = Math.round(finalAmount * 100.0) / 100.0;
+                clone.unit = finalUnit;
+                clone.image = ingredient.image;
+                clone.original = ingredient.original;
+                combined.put(key, clone);
             }
         }
     }
 
-    private ExtendedIngredient processIngredient(ExtendedIngredient original) {
-        ExtendedIngredient cloned = new ExtendedIngredient();
-        cloned.setName(original.getName());
-        cloned.setAmount(original.getAmount());
-        cloned.setUnit(original.getUnit());
-        return cloned;
-    }
 
-    private ExtendedIngredient cloneIngredient(ExtendedIngredient original) {
-        ExtendedIngredient cloned = new ExtendedIngredient();
-        cloned.setName(original.getName());
-        cloned.setAmount(original.getAmount());
-        cloned.setUnit(original.getUnit());
+    private String normalizeUnit(String originalUnit) {
+        if (originalUnit == null) return "";
 
-        // Clone measures if needed
-        if (original.getMeasures() != null) {
-            Measures measures = new Measures();
-            measures.setMetric(cloneMetric(original.getMeasures().getMetric()));
-            cloned.setMeasures(measures);
-        }
-        return cloned;
-    }
-
-    private Metric cloneMetric(Metric original) {
-        Metric metric = new Metric();
-        metric.setAmount(original.getAmount());
-        metric.setUnitShort(original.getUnitShort());
-        metric.setUnitLong(original.getUnitLong());
-        return metric;
+        return originalUnit.toLowerCase()
+                .replaceAll("s$", "")
+                .replaceAll("\\.$", "")
+                .replace("tbsp", "tablespoon")
+                .replace("tsp", "teaspoon")
+                .replace("servings", "serving")
+                .replace("grams", "gram")
+                .replace("ounces", "ounce")
+                .trim();
     }
 
     private void showProgressDialog() {

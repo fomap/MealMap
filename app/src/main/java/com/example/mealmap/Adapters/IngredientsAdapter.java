@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.example.mealmap.Models.ExtendedIngredient;
+import com.example.mealmap.PreferenceManager;
 import com.example.mealmap.R;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,12 +31,24 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsViewHold
         ExtendedIngredient ingredient = list.get(position);
         holder.textView_ingredients_name.setText(ingredient.name);
         holder.textView_ingredients_name.setSelected(true);
-        if (ingredient.measures != null && ingredient.measures.metric != null) {
-            String quantity = ingredient.measures.metric.amount + " " + ingredient.measures.metric.unitShort;
+
+
+        if (ingredient.measures != null) {
+            boolean isMetric = PreferenceManager.isMetric(context);
+            String quantity;
+            if (isMetric && ingredient.measures.metric != null) {
+                quantity = ingredient.measures.metric.amount + " " + ingredient.measures.metric.unitShort;
+            } else if (!isMetric && ingredient.measures.us != null) {
+                quantity = ingredient.measures.us.amount + " " + ingredient.measures.us.unitShort;
+            } else {
+                quantity = ingredient.original;
+            }
             holder.textView_ingredients_quantity.setText(quantity);
         } else {
             holder.textView_ingredients_quantity.setText(ingredient.original);
         }
+
+
         holder.textView_ingredients_quantity.setSelected(true);
     }
 

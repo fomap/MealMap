@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -15,15 +16,17 @@
         android:theme="@style/Theme.MealMap"
         tools:targetApi="31">
         <activity
+            android:name=".UserProfileActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".GroceryList.GroceryListActivity"
             android:exported="false"
             android:launchMode="singleTop" />
-
         <activity
             android:name=".MealPlanning.MealPlanningActivity"
             android:exported="false"
-            android:launchMode="singleTop"
-           />
+            android:launchMode="singleTop" />
         <activity
             android:name=".Auth.SignUpActivity"
             android:exported="false"
@@ -31,26 +34,22 @@
         <activity
             android:name=".Playlist.PlaylistActivity"
             android:exported="false"
-            android:launchMode="singleTop"
-            />
-
-        <activity android:name=".Adapters.FragmentHostActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".Adapters.FragmentHostActivity"
             android:exported="false"
-            android:theme="@style/Theme.MealMap.NoActionBar"
             android:parentActivityName=".Playlist.PlaylistActivity"
-
-            />
-
+            android:theme="@style/Theme.MealMap.NoActionBar" />
         <activity
             android:name=".RecipeDetailsActivity"
             android:exported="false"
-            android:theme="@style/Theme.MealMap.NoActionBar"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.MealMap.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop"/>
+
         <activity
             android:name=".Auth.LoginActivity"
             android:exported="false" />
@@ -59,7 +58,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

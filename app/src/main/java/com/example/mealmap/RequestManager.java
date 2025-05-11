@@ -26,11 +26,17 @@ public class RequestManager {
     public RequestManager(Context context) {
         this.context = context;
     }
-    public void getRandomRecipes(RandomRecipeResponseListener listener, List<String> tags)
-    {
+
+    private String getCurrentApiKey() {
+        return UserProfileActivity.getCurrentApiKey(context);
+    }
+    public void getRandomRecipes(RandomRecipeResponseListener listener, List<String> tags) {
+
+        String units = PreferenceManager.isMetric(context) ? "metric" : "us";
+
         CaLLRandomRecipes caLLRandomRecipes = retrofit.create(CaLLRandomRecipes.class);
-        Call<RandomRecipeApiResponse> call = caLLRandomRecipes.callRandomRecipe(context.getString(R.string.api_key), "1", tags);
-        call.enqueue(new Callback<RandomRecipeApiResponse>() {
+        Call<RandomRecipeApiResponse> request = caLLRandomRecipes.callRandomRecipe(getCurrentApiKey(), "1", tags, units);
+        request.enqueue(new Callback<RandomRecipeApiResponse>() {
             @Override
             public void onResponse(Call<RandomRecipeApiResponse> call, Response<RandomRecipeApiResponse> response) {
                 if (!response.isSuccessful())
@@ -46,10 +52,12 @@ public class RequestManager {
             }
         });
     }
-    public void getRecipeDetails(RecipeDetailsListener listener, int id)
-    {
+    public void getRecipeDetails(RecipeDetailsListener listener, int id) {
+
+        String units = PreferenceManager.isMetric(context) ? "metric" : "us";
+
         CallRecipeDetails callRecipeDetails = retrofit.create(CallRecipeDetails.class);
-        Call<RecipeDetailsResponse> call = callRecipeDetails.callRecipeDerails(id, context.getString(R.string.api_key));
+        Call<RecipeDetailsResponse> call = callRecipeDetails.callRecipeDetails(id, getCurrentApiKey(), true, units);
         call.enqueue(new Callback<RecipeDetailsResponse>() {
             @Override
             public void onResponse(Call<RecipeDetailsResponse> call, Response<RecipeDetailsResponse> response) {
@@ -68,7 +76,7 @@ public class RequestManager {
     }
     public void getInstructions(InstructionsListener listener, int id){
         CallInstructions callInstructions = retrofit.create(CallInstructions.class);
-        Call<List<InstructionsResponse>> call = callInstructions.callInstructions(id, context.getString(R.string.api_key));
+        Call<List<InstructionsResponse>> call = callInstructions.callInstructions(id, getCurrentApiKey());
         call.enqueue(new Callback<List<InstructionsResponse>>() {
             @Override
             public void onResponse(Call<List<InstructionsResponse>> call, Response<List<InstructionsResponse>> response) {
@@ -91,14 +99,17 @@ public class RequestManager {
         Call<RandomRecipeApiResponse> callRandomRecipe(
                 @Query("apiKey") String apiKey,
                 @Query("number") String number,
-                @Query("tags") List<String> tags
+                @Query("tags") List<String> tags,
+                @Query("units") String units
         );
     }
     private interface CallRecipeDetails{
         @GET("recipes/{id}/information")
-        Call<RecipeDetailsResponse> callRecipeDerails(
+        Call<RecipeDetailsResponse> callRecipeDetails(
                 @Path("id") int id,
-                @Query("apiKey") String apiKey
+                @Query("apiKey") String apiKey,
+                @Query("includeNutrition") boolean includeNutrition,
+                @Query("units") String units
         );
     }
     private interface CallInstructions{

@@ -39,10 +39,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PreferenceManager.setMetric(this, true);
         recyclerView = findViewById(R.id.recycler_random);
 
         btnUserProfile = findViewById(R.id.btn_profile);
         btnUserProfile.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            startActivity(intent);
         });
 
         dialog = new ProgressDialog(this);
