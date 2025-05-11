@@ -177,6 +177,13 @@
                         android:paddingVertical="8dp"
                         android:text="key4"/>
 
+                    <RadioButton
+                        android:id="@+id/radio_key5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="8dp"
+                        android:text="key5"/>
+
                 </RadioGroup>
 
                 <Button

@@ -29,6 +29,7 @@ public class EntryPointActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry_point);
+
         auth = FirebaseAuth.getInstance();
         emailSignInBtn = findViewById(R.id.btn_email);
         emailSignInBtn.setOnClickListener(v -> {

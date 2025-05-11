@@ -1,31 +1,26 @@
 package com.example.mealmap;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.io.IOException;
+import com.google.firebase.auth.UserInfo;
 
 
 public class UserProfileActivity extends AppCompatActivity {
@@ -57,7 +52,6 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-
         tvEmail = findViewById(R.id.tv_email);
         measurementGroup = findViewById(R.id.radio_measurement);
         apiKeyGroup = findViewById(R.id.radio_api_keys);
@@ -68,7 +62,6 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserData() {
-
         boolean isMetric = PreferenceManager.isMetric(this);
         measurementGroup.check(isMetric ? R.id.radio_metric : R.id.radio_us);
 
@@ -80,8 +73,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-
-        findViewById(R.id.btn_change_email).setOnClickListener(v -> showEmailDialog());
+        //findViewById(R.id.btn_change_email).setOnClickListener(v -> showEmailDialog());
         findViewById(R.id.btn_change_password).setOnClickListener(v -> showPasswordDialog());
 
         measurementGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -106,58 +98,131 @@ public class UserProfileActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Change Email");
 
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        input.setText(currentUser.getEmail());
-        builder.setView(input);
+        View view = getLayoutInflater().inflate(R.layout.dialog_auth, null);
+        EditText etCurrentPassword = view.findViewById(R.id.et_current_password);
+        EditText etNewEmail = view.findViewById(R.id.et_new_value);
+
+        etCurrentPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        etNewEmail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        etNewEmail.setHint("New email");
+
+        builder.setView(view);
 
         builder.setPositiveButton("Change", (dialog, which) -> {
-            String newEmail = input.getText().toString().trim();
+            String currentPassword = etCurrentPassword.getText().toString();
+            String newEmail = etNewEmail.getText().toString().trim();
+
             if (isValidEmail(newEmail)) {
-                updateEmail(newEmail);
+                reAuthenticateAndUpdateEmail(currentPassword, newEmail);
+            } else {
+                Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
-    }
-
-    private void updateEmail(String newEmail) {
-        currentUser.updateEmail(newEmail)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        tvEmail.setText("Email: " + newEmail);
-                        Toast.makeText(this, "Email updated", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Error: " + task.getException(), Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     private void showPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Change Password");
 
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
+        View view = getLayoutInflater().inflate(R.layout.dialog_auth, null);
+        EditText etCurrentPassword = view.findViewById(R.id.et_current_password);
+        EditText etNewPassword = view.findViewById(R.id.et_new_value);
+
+        etCurrentPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        etNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        etNewPassword.setHint("New password (min 6 characters)");
+
+        builder.setView(view);
 
         builder.setPositiveButton("Change", (dialog, which) -> {
-            String newPassword = input.getText().toString().trim();
+            String currentPassword = etCurrentPassword.getText().toString();
+            String newPassword = etNewPassword.getText().toString().trim();
+
             if (newPassword.length() >= 6) {
-                updatePassword(newPassword);
+                reAuthenticateAndUpdatePassword(currentPassword, newPassword);
+            } else {
+                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
 
+    private void reAuthenticateAndUpdateEmail(String currentPassword, String newEmail) {
+        if (currentUser == null || currentUser.getEmail() == null) {
+            Toast.makeText(this, "User or email is null", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (UserInfo profile : currentUser.getProviderData()) {
+            Log.d("PROVIDER", "Provider: " + profile.getProviderId());
+        }
+
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(currentUser.getEmail(), currentPassword);
+
+        currentUser.reauthenticate(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("AUTH", "Re-authentication successful");
+                        updateEmail(newEmail);
+                    } else {
+                        Exception e = task.getException();
+                        Log.e("AUTH", "Re-authentication failed: " + (e != null ? e.getMessage() : "Unknown error"));
+                        e.printStackTrace(); // See full stack trace in Logcat
+                        Toast.makeText(this, "Re-auth failed: " + (e != null ? e.getMessage() : ""), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void reAuthenticateAndUpdatePassword(String currentPassword, String newPassword) {
+        if (currentUser == null) {
+            Toast.makeText(this, "User not signed in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(currentUser.getEmail(), currentPassword);
+
+        currentUser.reauthenticate(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        updatePassword(newPassword);
+                    } else {
+                        Toast.makeText(this, "Re-authentication failed: " +
+                                task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void updateEmail(String newEmail) {
+        currentUser.updateEmail(newEmail)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("EMAIL", "Email update successful");
+                        currentUser.sendEmailVerification();
+                        tvEmail.setText("email;" + newEmail);
+                        Toast.makeText(this, "Verification email sent", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Exception e = task.getException();
+                        Log.e("EMAIL", "Email update failed: " + (e != null ? e.getMessage() : "Unknown error"));
+                        e.printStackTrace(); // For detailed debugging
+                        Toast.makeText(this, "Update failed: " + (e != null ? e.getMessage() : ""), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
     private void updatePassword(String newPassword) {
+        if (currentUser == null) return;
+
         currentUser.updatePassword(newPassword)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(this, "Password updated", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Password updated successfully", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Error: " + task.getException(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -171,6 +236,7 @@ public class UserProfileActivity extends AppCompatActivity {
         onBackPressed();
         return true;
     }
+
     public static String getCurrentApiKey(Context context) {
         SharedPreferences apiPrefs = context.getSharedPreferences("api_prefs", MODE_PRIVATE);
         int index = apiPrefs.getInt("selected_key_index", 0);
